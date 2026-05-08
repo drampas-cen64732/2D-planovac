@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="cs">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>2D Návrh Pozemku a Domu</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/fabric.js/5.3.1/fabric.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+
+    <style>
+        :root {
+            --primary: #2563eb;
+            --primary-hover: #1d4ed8;
+            --bg-color: #f8fafc;
+            --panel-bg: #ffffff;
+            --text: #1e293b;
+            --border: #e2e8f0;
+        }
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            font-family: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text);
+            height: 100vh;
+            display: flex;
+            overflow: hidden;
+        }
+
+        /* Postranní panel */
+        #sidebar {
+            width: 340px;
+            background-color: var(--panel-bg);
+            border-right: 1px solid var(--border);
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0,0,0,0.05);
+            z-index: 10;
+        }
+
+        .panel-header {
+            padding: 20px;
+            border-bottom: 1px solid var(--border);
+            background-color: #f1f5f9;
+        }
+
+        .panel-header h1 {
+            font-size: 1.2rem;
+            margin: 0 0 5px 0;
+            color: #0f172a;
+        }
+
+        .panel-header p {
+            font-size: 0.85rem;
+            color: #64748b;
+            margin: 0;
+        }
+
+        .panel-content {
+            padding: 20px;
+            flex-grow: 1;
+            overflow-y: auto;
+        }
+
+        h2 {
+            font-size: 0.95rem;
+            margin-top: 0;
+            margin-bottom: 12px;
+            color: #334155;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        /* Tlačítka a inputy */
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            background-color: white;
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            cursor: pointer;
+            text-align: left;
+            font-size: 0.9rem;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+        }
+
+        .btn:hover {
+            border-color: var(--primary);
+            background-color: #eff6ff;
+            color: var(--primary);
+        }
+
+        .btn-primary {
+            background-color: var(--primary);
+            color: white;
+            border: none;
+            font-weight: 600;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            color: white;
+        }
+
+        .btn-danger {
+            background-color: #fee2e2;
+            color: #dc2626;
+            border: 1px solid #fecaca;
+            text-align: center;
+            justify-content: center;
+        }
+
+        .btn-danger:hover {
+            background-color: #fca5a5;
+            color: #991b1b;
+        }
+
+        .custom-inputs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 8px;
+        }
+
+        .custom-inputs input {
+            width: 50%;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 0.9rem;
+        }
+
+        .custom-label-input {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid var(--border);
+            border-radius: 4px;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+            box-sizing: border-box;
+        }
+
+        .section {
+            margin-bottom: 25px;
+        }
+
+        .section-divider {
+            height: 1px;
+            background-color: var(--border);
+            margin: 15px 0;
+        }
+
+        /* Pracovní plocha */
+        #workspace {
+            flex-grow: 1;
+            position: relative;
+            background-color: #e2e8f0;
+            background-image: 
+                linear-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(255, 255, 255, 0.4) 1px, transparent 1px);
+            background-size: 20px 20px; /* 1 metr = 20px */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            overflow: auto;
+        }
+
+        .canvas-container {
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            background-color: white;
+        }
+
+        #import-input { display: none; }
+    </style>
+</head>
+<body>
+
+    <div id="sidebar">
+        <div class="panel-header">
+            <h1>Návrh Pozemku</h1>
+            <p>1 dílek mřížky = 1 metr</p>
+        </div>
+        
+        <div class="panel-content">
+            <div class="section">
+                <h2>Typy domů</h2>
+                <button class="btn btn-primary" onclick="addHouse('blanka')">🏠 Dům (Blanka 36) - Detailní</button>
+                <button class="btn btn-primary" onclick="addHouse('bungalowL')">📐 Bungalov do L (140 m²)</button>
+                <button class="btn btn-primary" onclick="addHouse('longWide')">📏 Dlouhý široký dům (136 m²)</button>
+                <button class="btn btn-primary" onclick="addHouse('classicBungalow')">🔲 Klasický bungalov (130 m²)</button>
+            </div>
+
+            <div class="section">
+                <h2>Stavby a zpevněné plochy</h2>
+                <button class="btn" onclick="addShape('carport')">🚗 Dvojitý přístřešek (6x6 m)</button>
+                <button class="btn" onclick="addShape('gardenHouse')">🛖 Zahradní domek (5x3 m)</button>
+                <button class="btn" onclick="addShape('terrace')">🪵 Terasa (6x4 m)</button>
+                <button class="btn" onclick="addShape('driveway')">🛣️ Zpevněná cesta (5x3 m)</button>
+            </div>
+
+            <div class="section">
+                <h2>Zahrada, volný čas a doplňky</h2>
+                <button class="btn" onclick="addShape('pool')">🏊 Bazén (6x3 m)</button>
+                <button class="btn" onclick="addShape('dining')">🍽️ Venkovní posezení (pro 6 osob)</button>
+                <button class="btn" onclick="addShape('lounge')">🛋️ Klidová zóna (gauč + křesla)</button>
+                <button class="btn" onclick="addShape('firepit')">🔥 Ohniště (Ø 1.5 m)</button>
+                <button class="btn" onclick="addShape('tree')">🌳 Strom (Ø 3 m)</button>
+                <button class="btn" onclick="addShape('greenery')">🌿 Okrasná zeleň (3x2 m)</button>
+                <button class="btn" onclick="addShape('flowerbed')">🌷 Záhon (3x1 m)</button>
+                <button class="btn" onclick="addShape('trash')">🗑️ Popelnice (Sada 3ks)</button>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <div class="section">
+                <h2>Vlastní prvek na míru</h2>
+                <div class="custom-inputs">
+                    <input type="number" id="custom-w" placeholder="Šířka (m)" min="0.1" step="0.1">
+                    <input type="number" id="custom-h" placeholder="Délka (m)" min="0.1" step="0.1">
+                </div>
+                <input type="text" id="custom-label" class="custom-label-input" placeholder="Název objektu (např. Pískoviště)">
+                <button class="btn" style="border-color: #94a3b8; font-weight: bold; justify-content: center;" onclick="addCustomShape()">➕ Vložit vlastní objekt</button>
+            </div>
+
+            <div class="section-divider"></div>
+
+            <div class="section">
+                <h2>Nástroje</h2>
+                <button class="btn btn-danger" onclick="deleteSelected()">🗑️ Smazat vybrané (Del)</button>
+            </div>
+
+            <div class="section">
+                <h2>Export / Import</h2>
+                <button class="btn" onclick="exportPDF()">📄 Stáhnout jako PDF</button>
+                <button class="btn" onclick="exportJSON()">💾 Uložit návrh (Soubor)</button>
+                <button class="btn" onclick="document.getElementById('import-input').click()">📂 Načíst návrh</button>
+                <input type="file" id="import-input" accept=".json" onchange="importJSON(event)">
+            </div>
+        </div>
+    </div>
+
+    <div id="workspace">
+        <canvas id="c"></canvas>
+    </div>
+
+<script>
+    const PPM = 20; 
+
+    fabric.Object.prototype.transparentCorners = false;
+    fabric.Object.prototype.cornerColor = '#2563eb';
+    fabric.Object.prototype.cornerStyle = 'circle';
+    fabric.Object.prototype.snapAngle = 90;
+    fabric.Object.prototype.snapThreshold = 10;
+
+    const canvas = new fabric.Canvas('c', {
+        width: 1000,
+        height: 850,
+        preserveObjectStacking: true
+    });
+
+    // --- 1. VYKRESLENÍ POZEMKU ---
+    function drawPlot() {
+        const centerX = canvas.width / 2;
+        const centerY = canvas.height / 2;
+
+        const outerPoints = [
+            { x: 0 * PPM, y: 0 * PPM },
+            { x: 14.98 * PPM, y: 0 * PPM },
+            { x: 20 * PPM, y: 2.05 * PPM },
+            { x: 20 * PPM, y: 34.63 * PPM },
+            { x: 0 * PPM, y: 34.63 * PPM }
+        ];
+
+        // Změna: Spodní (jižní) hranice y: 34.63 se dotýká okraje - bez šrafování
+        const innerPoints = [
+            { x: 2 * PPM, y: 2 * PPM },
+            { x: 14.58 * PPM, y: 2 * PPM },
+            { x: 18 * PPM, y: 3.39 * PPM },
+            { x: 18 * PPM, y: 34.63 * PPM }, 
+            { x: 2 * PPM, y: 34.63 * PPM }  
+        ];
+
+        const hatchCanvas = document.createElement('canvas');
+        hatchCanvas.width = 12;
+        hatchCanvas.height = 12;
+        const hctx = hatchCanvas.getContext('2d');
+        hctx.strokeStyle = 'rgba(239, 68, 68, 0.4)';
+        hctx.lineWidth = 1.5;
+        hctx.beginPath();
+        hctx.moveTo(0, 12);
+        hctx.lineTo(12, 0);
+        hctx.stroke();
+
+        const hatchPattern = new fabric.Pattern({ source: hatchCanvas, repeat: 'repeat' });
+
+        const outerHatch = new fabric.Polygon(outerPoints, {
+            left: centerX, top: centerY, originX: 'center', originY: 'center',
+            fill: hatchPattern, stroke: '#ef4444', strokeWidth: 1,
+            selectable: false, evented: false
+        });
+
+        const innerPlot = new fabric.Polygon(innerPoints, {
+            left: centerX, top: centerY, originX: 'center', originY: 'center',
+            fill: '#e2f0d9', stroke: '#7e9c65', strokeWidth: 1.5,
+            selectable: false, evented: false
+        });
+
+        const text = new fabric.Text("Pozemek 250/25\nRozloha: 680.6 m²\n(Jih bez odstupu)", {
+            left: centerX, top: centerY, fontSize: 15, fill: '#557041',
+            textAlign: 'center', originX: 'center', originY: 'center',
+            selectable: false, evented: false
+        });
+
+        canvas.add(outerHatch, innerPlot, text);
+        canvas.sendToBack(text);
+        canvas.sendToBack(innerPlot);
+        canvas.sendToBack(outerHatch);
+    }
+
+    drawPlot();
+
+    // --- 2. VLOŽENÍ DOMŮ ---
+    function addHouse(type) {
+        let objs = [];
+        let groupW, groupH;
+
+        if (type === 'blanka') {
+            const w = 9.7 * PPM, h = 7.9 * PPM;
+            objs.push(new fabric.Rect({ left: 0, top: 0, width: w, height: h, fill: '#ffffff', stroke: '#333', strokeWidth: 3 }));
+            objs.push(new fabric.Rect({ left: 5, top: 5, width: 85, height: 148, fill: '#fff0db', stroke: '#888', strokeWidth: 1 }));
+            objs.push(new fabric.Text("Obývák", { left: 47, top: 79, fontSize: 11, originX: 'center', originY: 'center', fill: '#555' }));
+            objs.push(new fabric.Rect({ left: 135, top: 5, width: 54, height: 70, fill: '#fff0db', stroke: '#888', strokeWidth: 1 }));
+            objs.push(new fabric.Rect({ left: 135, top: 80, width: 54, height: 35, fill: '#e0f2fe', stroke: '#888', strokeWidth: 1 }));
+            objs.push(new fabric.Rect({ left: 135, top: 120, width: 54, height: 33, fill: '#f1f5f9', stroke: '#888', strokeWidth: 1 }));
+            objs.push(new fabric.Triangle({ left: 112, top: h + 10, width: 15, height: 15, fill: 'black', angle: 180, originX: 'center', originY: 'center' }));
+        } 
+        else if (type === 'bungalowL') {
