@@ -31,7 +31,7 @@
 
         /* Postranní panel */
         #sidebar {
-            width: 340px;
+            width: 350px;
             background-color: var(--panel-bg);
             border-right: 1px solid var(--border);
             display: flex;
@@ -52,48 +52,48 @@
             color: #0f172a;
         }
 
-        .panel-header p {
-            font-size: 0.85rem;
-            color: #64748b;
-            margin: 0;
-        }
-
         .panel-content {
-            padding: 20px;
+            padding: 15px;
             flex-grow: 1;
             overflow-y: auto;
         }
 
         h2 {
-            font-size: 0.95rem;
-            margin-top: 0;
-            margin-bottom: 12px;
-            color: #334155;
+            font-size: 0.85rem;
+            margin-top: 15px;
+            margin-bottom: 10px;
+            color: #64748b;
             text-transform: uppercase;
-            letter-spacing: 0.5px;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #f1f5f9;
+            padding-bottom: 5px;
         }
 
-        /* Tlačítka a inputy */
+        /* Sjednocená tlačítka */
         .btn {
-            display: block;
+            display: flex;
+            align-items: center;
+            justify-content: flex-start;
             width: 100%;
-            padding: 8px 12px;
-            margin-bottom: 8px;
+            height: 40px; /* Fixní výška pro všechna tlačítka */
+            padding: 0 15px;
+            margin-bottom: 6px;
             background-color: white;
             border: 1px solid var(--border);
             border-radius: 6px;
             cursor: pointer;
-            text-align: left;
             font-size: 0.9rem;
             transition: all 0.2s ease;
-            display: flex;
-            align-items: center;
+            box-sizing: border-box;
+            white-space: nowrap;
+            overflow: hidden;
         }
 
         .btn:hover {
             border-color: var(--primary);
             background-color: #eff6ff;
             color: var(--primary);
+            transform: translateX(3px);
         }
 
         .btn-primary {
@@ -101,6 +101,7 @@
             color: white;
             border: none;
             font-weight: 600;
+            justify-content: center;
         }
 
         .btn-primary:hover {
@@ -112,8 +113,8 @@
             background-color: #fee2e2;
             color: #dc2626;
             border: 1px solid #fecaca;
-            text-align: center;
             justify-content: center;
+            margin-top: 10px;
         }
 
         .btn-danger:hover {
@@ -121,58 +122,43 @@
             color: #991b1b;
         }
 
+        /* Sekce pro vlastní rozměry */
+        .custom-box {
+            background: #f8fafc;
+            padding: 12px;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+            margin-top: 10px;
+        }
+
         .custom-inputs {
             display: flex;
-            gap: 10px;
+            gap: 8px;
             margin-bottom: 8px;
         }
 
-        .custom-inputs input {
-            width: 50%;
+        .custom-inputs input, .custom-label-input {
+            flex: 1;
             padding: 8px;
             border: 1px solid var(--border);
             border-radius: 4px;
-            font-size: 0.9rem;
-        }
-
-        .custom-label-input {
+            font-size: 0.85rem;
             width: 100%;
-            padding: 8px;
-            border: 1px solid var(--border);
-            border-radius: 4px;
-            font-size: 0.9rem;
-            margin-bottom: 8px;
             box-sizing: border-box;
-        }
-
-        .section {
-            margin-bottom: 25px;
-        }
-
-        .section-divider {
-            height: 1px;
-            background-color: var(--border);
-            margin: 15px 0;
         }
 
         /* Pracovní plocha */
         #workspace {
             flex-grow: 1;
-            position: relative;
             background-color: #e2e8f0;
             background-image: 
                 linear-gradient(rgba(255, 255, 255, 0.4) 1px, transparent 1px),
                 linear-gradient(90deg, rgba(255, 255, 255, 0.4) 1px, transparent 1px);
-            background-size: 20px 20px; /* 1 metr = 20px */
+            background-size: 20px 20px;
             display: flex;
             align-items: center;
             justify-content: center;
             overflow: auto;
-        }
-
-        .canvas-container {
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            background-color: white;
         }
 
         #import-input { display: none; }
@@ -183,64 +169,50 @@
     <div id="sidebar">
         <div class="panel-header">
             <h1>Návrh Pozemku</h1>
-            <p>1 dílek mřížky = 1 metr</p>
+            <p style="font-size: 0.8rem; color: #64748b; margin:0;">Měřítko: 1 mřížka = 1 metr</p>
         </div>
         
         <div class="panel-content">
-            <div class="section">
-                <h2>Typy domů</h2>
-                <button class="btn btn-primary" onclick="addHouse('blanka')">🏠 Dům (Blanka 36) - Detailní</button>
-                <button class="btn btn-primary" onclick="addHouse('bungalowL')">📐 Bungalov do L (140 m²)</button>
-                <button class="btn btn-primary" onclick="addHouse('longWide')">📏 Dlouhý široký dům (136 m²)</button>
-                <button class="btn btn-primary" onclick="addHouse('classicBungalow')">🔲 Klasický bungalov (130 m²)</button>
-            </div>
+            <h2>Typy domů</h2>
+            <button class="btn btn-primary" onclick="addHouse('blanka')">🏠 Dům Blanka 36</button>
+            <button class="btn btn-primary" onclick="addHouse('bungalowL')">📐 Bungalov do L (140 m²)</button>
+            <button class="btn btn-primary" onclick="addHouse('longWide')">📏 Dlouhý široký dům</button>
+            <button class="btn btn-primary" onclick="addHouse('classicBungalow')">🔲 Klasický bungalov</button>
 
-            <div class="section">
-                <h2>Stavby a zpevněné plochy</h2>
-                <button class="btn" onclick="addShape('carport')">🚗 Dvojitý přístřešek (6x6 m)</button>
-                <button class="btn" onclick="addShape('gardenHouse')">🛖 Zahradní domek (5x3 m)</button>
-                <button class="btn" onclick="addShape('terrace')">🪵 Terasa (6x4 m)</button>
-                <button class="btn" onclick="addShape('driveway')">🛣️ Zpevněná cesta (5x3 m)</button>
-            </div>
+            <h2>Stavby</h2>
+            <button class="btn" onclick="addShape('carport')">🚗 Přístřešek (6x6 m)</button>
+            <button class="btn" onclick="addShape('gardenHouse')">🛖 Zahradní domek (5x3 m)</button>
+            <button class="btn" onclick="addShape('terrace')">🪵 Terasa (6x4 m)</button>
+            <button class="btn" onclick="addShape('driveway')">🛣️ Zpevněná cesta (5x3 m)</button>
+            <button class="btn" onclick="addShape('stonePath')">👣 Nášlapná cesta (4x1 m)</button>
 
-            <div class="section">
-                <h2>Zahrada, volný čas a doplňky</h2>
-                <button class="btn" onclick="addShape('pool')">🏊 Bazén (6x3 m)</button>
-                <button class="btn" onclick="addShape('dining')">🍽️ Venkovní posezení (pro 6 osob)</button>
-                <button class="btn" onclick="addShape('lounge')">🛋️ Klidová zóna (gauč + křesla)</button>
-                <button class="btn" onclick="addShape('firepit')">🔥 Ohniště (Ø 1.5 m)</button>
-                <button class="btn" onclick="addShape('tree')">🌳 Strom (Ø 3 m)</button>
-                <button class="btn" onclick="addShape('greenery')">🌿 Okrasná zeleň (3x2 m)</button>
-                <button class="btn" onclick="addShape('flowerbed')">🌷 Záhon (3x1 m)</button>
-                <button class="btn" onclick="addShape('trash')">🗑️ Popelnice (Sada 3ks)</button>
-            </div>
+            <h2>Zahrada a relax</h2>
+            <button class="btn" onclick="addShape('pool')">🏊 Bazén (6x3 m)</button>
+            <button class="btn" onclick="addShape('dining')">🍽️ Posezení 6 osob</button>
+            <button class="btn" onclick="addShape('lounge')">🛋️ Relax zóna s gaučem</button>
+            <button class="btn" onclick="addShape('firepit')">🔥 Ohniště</button>
+            <button class="btn" onclick="addShape('tree')">🌳 Strom</button>
+            <button class="btn" onclick="addShape('greenery')">🌿 Okrasná zeleň</button>
+            <button class="btn" onclick="addShape('flowerbed')">🌷 Záhon</button>
+            <button class="btn" onclick="addShape('trash')">🗑️ Popelnice</button>
 
-            <div class="section-divider"></div>
-
-            <div class="section">
-                <h2>Vlastní prvek na míru</h2>
+            <h2>Vlastní prvek</h2>
+            <div class="custom-box">
                 <div class="custom-inputs">
-                    <input type="number" id="custom-w" placeholder="Šířka (m)" min="0.1" step="0.1">
-                    <input type="number" id="custom-h" placeholder="Délka (m)" min="0.1" step="0.1">
+                    <input type="number" id="custom-w" placeholder="Šířka (m)" step="0.1">
+                    <input type="number" id="custom-h" placeholder="Délka (m)" step="0.1">
                 </div>
-                <input type="text" id="custom-label" class="custom-label-input" placeholder="Název objektu (např. Pískoviště)">
-                <button class="btn" style="border-color: #94a3b8; font-weight: bold; justify-content: center;" onclick="addCustomShape()">➕ Vložit vlastní objekt</button>
+                <input type="text" id="custom-label" class="custom-label-input" placeholder="Název objektu" style="margin-bottom: 8px;">
+                <button class="btn btn-primary" style="height: 35px; font-size: 0.8rem;" onclick="addCustomShape()">Vložit vlastní rozměr</button>
             </div>
 
-            <div class="section-divider"></div>
+            <button class="btn btn-danger" onclick="deleteSelected()">🗑️ Smazat vybrané</button>
 
-            <div class="section">
-                <h2>Nástroje</h2>
-                <button class="btn btn-danger" onclick="deleteSelected()">🗑️ Smazat vybrané (Del)</button>
-            </div>
-
-            <div class="section">
-                <h2>Export / Import</h2>
-                <button class="btn" onclick="exportPDF()">📄 Stáhnout jako PDF</button>
-                <button class="btn" onclick="exportJSON()">💾 Uložit návrh (Soubor)</button>
-                <button class="btn" onclick="document.getElementById('import-input').click()">📂 Načíst návrh</button>
-                <input type="file" id="import-input" accept=".json" onchange="importJSON(event)">
-            </div>
+            <h2>Export</h2>
+            <button class="btn" onclick="exportPDF()">📄 Stáhnout PDF</button>
+            <button class="btn" onclick="exportJSON()">💾 Uložit projekt</button>
+            <button class="btn" onclick="document.getElementById('import-input').click()">📂 Načíst projekt</button>
+            <input type="file" id="import-input" accept=".json" onchange="importJSON(event)">
         </div>
     </div>
 
@@ -250,12 +222,10 @@
 
 <script>
     const PPM = 20; 
-
     fabric.Object.prototype.transparentCorners = false;
     fabric.Object.prototype.cornerColor = '#2563eb';
     fabric.Object.prototype.cornerStyle = 'circle';
-    fabric.Object.prototype.snapAngle = 90;
-    fabric.Object.prototype.snapThreshold = 10;
+    fabric.Object.prototype.snapAngle = 45;
 
     const canvas = new fabric.Canvas('c', {
         width: 1000,
@@ -268,6 +238,7 @@
         const centerX = canvas.width / 2;
         const centerY = canvas.height / 2;
 
+        // Celý pozemek
         const outerPoints = [
             { x: 0 * PPM, y: 0 * PPM },
             { x: 14.98 * PPM, y: 0 * PPM },
@@ -276,7 +247,7 @@
             { x: 0 * PPM, y: 34.63 * PPM }
         ];
 
-        // Změna: Spodní (jižní) hranice y: 34.63 se dotýká okraje - bez šrafování
+        // Stavitelná plocha (offset 2m nahoře, vlevo, vpravo | dole 0m)
         const innerPoints = [
             { x: 2 * PPM, y: 2 * PPM },
             { x: 14.58 * PPM, y: 2 * PPM },
@@ -285,22 +256,19 @@
             { x: 2 * PPM, y: 34.63 * PPM }  
         ];
 
+        // Šrafování pouze pro vymezení 2m hranic (vynecháme spodek)
         const hatchCanvas = document.createElement('canvas');
-        hatchCanvas.width = 12;
-        hatchCanvas.height = 12;
+        hatchCanvas.width = 10; hatchCanvas.height = 10;
         const hctx = hatchCanvas.getContext('2d');
         hctx.strokeStyle = 'rgba(239, 68, 68, 0.4)';
-        hctx.lineWidth = 1.5;
-        hctx.beginPath();
-        hctx.moveTo(0, 12);
-        hctx.lineTo(12, 0);
-        hctx.stroke();
-
+        hctx.lineWidth = 1;
+        hctx.beginPath(); hctx.moveTo(0, 10); hctx.lineTo(10, 0); hctx.stroke();
         const hatchPattern = new fabric.Pattern({ source: hatchCanvas, repeat: 'repeat' });
 
+        // Objekt šrafování (Polygon, který odečte vnitřek od vnějšku, ale jen tam kde chceme)
         const outerHatch = new fabric.Polygon(outerPoints, {
             left: centerX, top: centerY, originX: 'center', originY: 'center',
-            fill: hatchPattern, stroke: '#ef4444', strokeWidth: 1,
+            fill: hatchPattern, stroke: '#ef4444', strokeWidth: 0.5,
             selectable: false, evented: false
         });
 
@@ -310,281 +278,180 @@
             selectable: false, evented: false
         });
 
-        const text = new fabric.Text("Pozemek 250/25\nRozloha: 680.6 m²\n(Jih bez odstupu)", {
-            left: centerX, top: centerY, fontSize: 15, fill: '#557041',
-            textAlign: 'center', originX: 'center', originY: 'center',
-            selectable: false, evented: false
-        });
-
-        canvas.add(outerHatch, innerPlot, text);
-        canvas.sendToBack(text);
+        canvas.add(outerHatch, innerPlot);
         canvas.sendToBack(innerPlot);
         canvas.sendToBack(outerHatch);
     }
 
     drawPlot();
 
-    // --- 2. VLOŽENÍ DOMŮ ---
+    // --- 2. FUNKCE PRO TEXT (Ochrana proti rozmazání) ---
+    function createText(str, size = 11, color = '#000') {
+        return new fabric.Text(str, {
+            fontSize: size,
+            fontFamily: 'Segoe UI',
+            fill: color,
+            textAlign: 'center',
+            originX: 'center',
+            originY: 'center',
+            objectCaching: false // KLÍČOVÉ: Zamezí rozmazání textu při změně měřítka
+        });
+    }
+
+    // --- 3. TYPY DOMŮ ---
     function addHouse(type) {
         let objs = [];
-        let groupW, groupH;
-
         if (type === 'blanka') {
             const w = 9.7 * PPM, h = 7.9 * PPM;
-            objs.push(new fabric.Rect({ left: 0, top: 0, width: w, height: h, fill: '#ffffff', stroke: '#333', strokeWidth: 3 }));
-            objs.push(new fabric.Rect({ left: 5, top: 5, width: 85, height: 148, fill: '#fff0db', stroke: '#888', strokeWidth: 1 }));
-            objs.push(new fabric.Text("Obývák", { left: 47, top: 79, fontSize: 11, originX: 'center', originY: 'center', fill: '#555' }));
-            objs.push(new fabric.Rect({ left: 135, top: 5, width: 54, height: 70, fill: '#fff0db', stroke: '#888', strokeWidth: 1 }));
-            objs.push(new fabric.Rect({ left: 135, top: 80, width: 54, height: 35, fill: '#e0f2fe', stroke: '#888', strokeWidth: 1 }));
-            objs.push(new fabric.Rect({ left: 135, top: 120, width: 54, height: 33, fill: '#f1f5f9', stroke: '#888', strokeWidth: 1 }));
-            objs.push(new fabric.Triangle({ left: 112, top: h + 10, width: 15, height: 15, fill: 'black', angle: 180, originX: 'center', originY: 'center' }));
+            objs.push(new fabric.Rect({ width: w, height: h, fill: '#fff', stroke: '#333', strokeWidth: 2 }));
+            objs.push(createText("Blanka 36", 14).set({top: -10}));
         } 
         else if (type === 'bungalowL') {
-            // L tvar (cca 140m2 zastavěná plocha: 14x8 křídlo + 6x6 roh)
-            objs.push(new fabric.Rect({ left: 0, top: 0, width: 8*PPM, height: 14*PPM, fill: '#fff', stroke: '#333', strokeWidth: 2 }));
-            objs.push(new fabric.Rect({ left: 8*PPM, top: 8*PPM, width: 6*PPM, height: 6*PPM, fill: '#fff', stroke: '#333', strokeWidth: 2 }));
-            // Znázornění valbové střechy
-            objs.push(new fabric.Line([4*PPM, 0, 4*PPM, 14*PPM], {stroke: '#888', strokeWidth: 1}));
-            objs.push(new fabric.Line([8*PPM, 11*PPM, 14*PPM, 11*PPM], {stroke: '#888', strokeWidth: 1}));
-            objs.push(new fabric.Line([4*PPM, 11*PPM, 8*PPM, 11*PPM], {stroke: '#888', strokeWidth: 1}));
-            objs.push(new fabric.Text("Bungalov L\n(140 m²)", { left: 4*PPM, top: 4*PPM, fontSize: 12, originX: 'center', originY: 'center' }));
+            objs.push(new fabric.Rect({ width: 8*PPM, height: 14*PPM, fill: '#fff', stroke: '#333', strokeWidth: 2 }));
+            objs.push(new fabric.Rect({ left: 4*PPM, top: 4*PPM, width: 6*PPM, height: 6*PPM, fill: '#fff', stroke: '#333', strokeWidth: 2 }));
+            objs.push(createText("Bungalov L", 12));
         }
         else if (type === 'longWide') {
-            // Dlouhý dům 17 x 8 m
-            objs.push(new fabric.Rect({ left: 0, top: 0, width: 17*PPM, height: 8*PPM, fill: '#fff', stroke: '#333', strokeWidth: 2 }));
-            // Valbová střecha
-            objs.push(new fabric.Line([3*PPM, 4*PPM, 14*PPM, 4*PPM], {stroke: '#888', strokeWidth: 1}));
-            objs.push(new fabric.Line([0, 0, 3*PPM, 4*PPM], {stroke: '#888', strokeWidth: 1}));
-            objs.push(new fabric.Line([0, 8*PPM, 3*PPM, 4*PPM], {stroke: '#888', strokeWidth: 1}));
-            objs.push(new fabric.Line([17*PPM, 0, 14*PPM, 4*PPM], {stroke: '#888', strokeWidth: 1}));
-            objs.push(new fabric.Line([17*PPM, 8*PPM, 14*PPM, 4*PPM], {stroke: '#888', strokeWidth: 1}));
-            objs.push(new fabric.Text("Široký dům\n(136 m²)", { left: 8.5*PPM, top: 4*PPM, fontSize: 12, originX: 'center', originY: 'center' }));
+            objs.push(new fabric.Rect({ width: 17*PPM, height: 8*PPM, fill: '#fff', stroke: '#333', strokeWidth: 2 }));
+            objs.push(createText("Dům 136m²", 12));
         }
         else if (type === 'classicBungalow') {
-            // Klasický obdélník 13 x 10 m
-            objs.push(new fabric.Rect({ left: 0, top: 0, width: 13*PPM, height: 10*PPM, fill: '#fff', stroke: '#333', strokeWidth: 2 }));
-            objs.push(new fabric.Line([3.5*PPM, 5*PPM, 9.5*PPM, 5*PPM], {stroke: '#888', strokeWidth: 1}));
-            objs.push(new fabric.Line([0, 0, 3.5*PPM, 5*PPM], {stroke: '#888', strokeWidth: 1}));
-            objs.push(new fabric.Line([0, 10*PPM, 3.5*PPM, 5*PPM], {stroke: '#888', strokeWidth: 1}));
-            objs.push(new fabric.Line([13*PPM, 0, 9.5*PPM, 5*PPM], {stroke: '#888', strokeWidth: 1}));
-            objs.push(new fabric.Line([13*PPM, 10*PPM, 9.5*PPM, 5*PPM], {stroke: '#888', strokeWidth: 1}));
-            objs.push(new fabric.Text("Klasický\nBungalov", { left: 6.5*PPM, top: 5*PPM, fontSize: 12, originX: 'center', originY: 'center' }));
+            objs.push(new fabric.Rect({ width: 13*PPM, height: 10*PPM, fill: '#fff', stroke: '#333', strokeWidth: 2 }));
+            objs.push(createText("Bungalov", 12));
         }
 
         const group = new fabric.Group(objs, {
             left: canvas.width / 2, top: canvas.height / 2,
-            originX: 'center', originY: 'center',
-            hasControls: true
+            originX: 'center', originY: 'center'
         });
         canvas.add(group);
         canvas.setActiveObject(group);
     }
 
-    // --- 3. KNIHOVNA OBJEKTŮ S VYLEPŠENOU GRAFIKOU ---
+    // --- 4. OSTATNÍ OBJEKTY ---
     function addShape(type) {
         let objs = [];
-        let w = 0, h = 0, labelText = '';
+        let label = "";
 
         switch(type) {
             case 'carport': 
-                w = 6*PPM; h = 6*PPM; labelText = 'Přístřešek';
-                objs.push(new fabric.Rect({ left: 0, top: 0, width: w, height: h, fill: 'rgba(203, 213, 225, 0.9)', stroke: '#475569' }));
-                // Sloupky
-                const ps = 0.3*PPM;
-                objs.push(new fabric.Rect({ left: 0.2*PPM, top: 0.2*PPM, width: ps, height: ps, fill: '#1e293b' }));
-                objs.push(new fabric.Rect({ left: w-ps-0.2*PPM, top: 0.2*PPM, width: ps, height: ps, fill: '#1e293b' }));
-                objs.push(new fabric.Rect({ left: 0.2*PPM, top: h-ps-0.2*PPM, width: ps, height: ps, fill: '#1e293b' }));
-                objs.push(new fabric.Rect({ left: w-ps-0.2*PPM, top: h-ps-0.2*PPM, width: ps, height: ps, fill: '#1e293b' }));
-                // Silueta střechy
-                objs.push(new fabric.Line([w/2, 0, w/2, h], {stroke: '#64748b', strokeDashArray: [5, 5]}));
-                break;
+                objs.push(new fabric.Rect({ width: 6*PPM, height: 6*PPM, fill: 'rgba(200,200,200,0.8)', stroke: '#666' }));
+                label = "Přístřešek"; break;
             case 'gardenHouse': 
-                w = 5*PPM; h = 3*PPM; labelText = 'Domek';
-                objs.push(new fabric.Rect({ left: 0, top: 0, width: w, height: h, fill: '#d4a373', stroke: '#8b5a2b', strokeWidth: 1.5 }));
-                objs.push(new fabric.Line([0, h/2, w, h/2], {stroke: '#78350f', strokeWidth: 2})); // hřeben střechy
-                break;
+                objs.push(new fabric.Rect({ width: 5*PPM, height: 3*PPM, fill: '#d4a373', stroke: '#8b5a2b' }));
+                label = "Domek"; break;
             case 'terrace': 
-                w = 6*PPM; h = 4*PPM; labelText = 'Terasa';
-                objs.push(new fabric.Rect({ left: 0, top: 0, width: w, height: h, fill: '#fcd34d', stroke: '#b45309' }));
-                for(let i=1; i<8; i++) objs.push(new fabric.Line([0, i*0.5*PPM, w, i*0.5*PPM], { stroke: '#d97706', strokeWidth: 1 })); // prkna
-                break;
+                objs.push(new fabric.Rect({ width: 6*PPM, height: 4*PPM, fill: '#fcd34d', stroke: '#b45309' }));
+                label = "Terasa"; break;
             case 'driveway': 
-                w = 5*PPM; h = 3*PPM; labelText = 'Cesta';
-                objs.push(new fabric.Rect({ left: 0, top: 0, width: w, height: h, fill: '#e5e7eb', stroke: '#9ca3af' }));
-                objs.push(new fabric.Rect({ left: 0.2*PPM, top: 0.2*PPM, width: w-0.4*PPM, height: h-0.4*PPM, fill: 'transparent', stroke: '#d1d5db', strokeDashArray: [3,3] }));
-                break;
+                objs.push(new fabric.Rect({ width: 5*PPM, height: 3*PPM, fill: '#cbd5e1', stroke: '#94a3b8' }));
+                label = "Cesta"; break;
+            case 'stonePath': 
+                for(let i=0; i<4; i++) {
+                    objs.push(new fabric.Rect({ left: i*PPM*1.1 - 35, top: 0, width: 0.8*PPM, height: 0.6*PPM, fill: '#94a3b8', rx: 5, ry: 5, stroke: '#64748b' }));
+                }
+                break; // Bez labelu
             case 'pool': 
-                w = 6*PPM; h = 3*PPM; labelText = 'Bazén';
-                objs.push(new fabric.Rect({ left: 0, top: 0, width: w, height: h, fill: '#7dd3fc', stroke: '#0284c7', rx: 3, ry: 3, strokeWidth: 2 }));
-                objs.push(new fabric.Rect({ left: 0.2*PPM, top: 0.2*PPM, width: w-0.4*PPM, height: h-0.4*PPM, fill: '#38bdf8', rx: 2, ry: 2 }));
-                objs.push(new fabric.Rect({ left: w-0.8*PPM, top: 0.5*PPM, width: 0.6*PPM, height: 0.15*PPM, fill: '#fff' })); // schůdky
-                objs.push(new fabric.Rect({ left: w-0.8*PPM, top: 0.8*PPM, width: 0.6*PPM, height: 0.15*PPM, fill: '#fff' }));
-                break;
+                objs.push(new fabric.Rect({ width: 6*PPM, height: 3*PPM, fill: '#38bdf8', stroke: '#0284c7', rx: 5, ry: 5 }));
+                label = "Bazén"; break;
             case 'firepit': 
-                w = 1.5*PPM; h = 1.5*PPM;
-                objs.push(new fabric.Circle({ left: 0, top: 0, radius: w/2, fill: '#9ca3af', stroke: '#4b5563' })); // kameny
-                objs.push(new fabric.Circle({ left: 0.3*PPM, top: 0.3*PPM, radius: 0.45*PPM, fill: '#27272a' })); // popel
-                objs.push(new fabric.Circle({ left: 0.45*PPM, top: 0.45*PPM, radius: 0.3*PPM, fill: '#ef4444' })); // oheň
-                objs.push(new fabric.Circle({ left: 0.55*PPM, top: 0.55*PPM, radius: 0.2*PPM, fill: '#fbbf24' }));
+                objs.push(new fabric.Circle({ radius: 0.75*PPM, fill: '#94a3b8', stroke: '#475569' }));
+                objs.push(new fabric.Circle({ radius: 0.4*PPM, fill: '#ef4444', left: 7, top: 7 }));
                 break;
             case 'tree': 
-                w = 3*PPM; h = 3*PPM;
-                objs.push(new fabric.Circle({ left: 0, top: 0, radius: w/2, fill: '#22c55e', opacity: 0.9 }));
-                objs.push(new fabric.Circle({ left: 0.4*PPM, top: 0.4*PPM, radius: 0.9*PPM, fill: '#4ade80', opacity: 0.8 }));
-                objs.push(new fabric.Circle({ left: 1.3*PPM, top: 1.3*PPM, radius: 0.2*PPM, fill: '#78350f' })); // kmen
+                objs.push(new fabric.Circle({ radius: 1.5*PPM, fill: '#22c55e', opacity: 0.8 }));
+                objs.push(new fabric.Circle({ radius: 0.3*PPM, fill: '#78350f', left: 24, top: 24 }));
                 break;
             case 'greenery': 
-                w = 3*PPM; h = 2*PPM;
-                objs.push(new fabric.Circle({ left: 0, top: 0.2*PPM, radius: 0.8*PPM, fill: '#86efac', stroke: '#22c55e' }));
-                objs.push(new fabric.Circle({ left: 1.4*PPM, top: 0, radius: 1*PPM, fill: '#4ade80', stroke: '#16a34a' }));
-                objs.push(new fabric.Circle({ left: 1*PPM, top: 0.6*PPM, radius: 0.7*PPM, fill: '#22c55e', stroke: '#15803d' }));
+                objs.push(new fabric.Ellipse({ rx: 1.5*PPM, ry: 1*PPM, fill: '#86efac', stroke: '#16a34a' }));
                 break;
             case 'flowerbed':
-                w = 3*PPM; h = 1*PPM; labelText = 'Záhon';
-                objs.push(new fabric.Rect({ left: 0, top: 0, width: w, height: h, fill: '#78350f', stroke: '#451a03', rx: 2, ry: 2 }));
-                // Kytičky/sazenice
-                for(let i=0.5; i<3; i++) {
-                    objs.push(new fabric.Circle({ left: i*PPM - 0.2*PPM, top: 0.3*PPM, radius: 0.2*PPM, fill: '#22c55e' }));
-                }
+                objs.push(new fabric.Rect({ width: 3*PPM, height: 1*PPM, fill: '#78350f', stroke: '#451a03' }));
                 break;
             case 'dining':
-                w = 3*PPM; h = 2.5*PPM; labelText = 'Posezení';
-                objs.push(new fabric.Rect({ left: 0, top: 0, width: w, height: h, fill: '#f3f4f6', rx: 4, ry: 4, stroke: '#e5e7eb' })); // podklad
-                objs.push(new fabric.Rect({ left: 0.5*PPM, top: 0.8*PPM, width: 2*PPM, height: 0.9*PPM, fill: '#d4a373', stroke: '#b45309' })); // stůl
-                // Židle
-                [0.7, 1.3, 1.9].forEach(x => {
-                    objs.push(new fabric.Circle({ left: x*PPM, top: 0.3*PPM, radius: 0.2*PPM, fill: '#9ca3af' }));
-                    objs.push(new fabric.Circle({ left: x*PPM, top: 1.8*PPM, radius: 0.2*PPM, fill: '#9ca3af' }));
-                });
+                objs.push(new fabric.Rect({ width: 2.5*PPM, height: 1.5*PPM, fill: '#d4a373', stroke: '#b45309' })); // Stůl
+                for(let i=0; i<3; i++) { // Židle
+                    objs.push(new fabric.Rect({ left: i*16, top: -10, width: 10, height: 10, fill: '#64748b' }));
+                    objs.push(new fabric.Rect({ left: i*16, top: 30, width: 10, height: 10, fill: '#64748b' }));
+                }
                 break;
             case 'lounge':
-                w = 4*PPM; h = 3*PPM; labelText = 'Relax';
-                objs.push(new fabric.Rect({ left: 0, top: 0, width: w, height: h, fill: '#e5e7eb', rx: 5, ry: 5 })); // koberec
-                objs.push(new fabric.Rect({ left: 1.5*PPM, top: 1.2*PPM, width: 1*PPM, height: 0.6*PPM, fill: '#8b5a2b', rx: 2, ry: 2 })); // stolek
-                objs.push(new fabric.Rect({ left: 0.8*PPM, top: 2*PPM, width: 2.4*PPM, height: 0.8*PPM, fill: '#4b5563', rx: 3, ry: 3 })); // gauč
-                objs.push(new fabric.Rect({ left: 0.8*PPM, top: 0.2*PPM, width: 0.8*PPM, height: 0.8*PPM, fill: '#4b5563', rx: 3, ry: 3 })); // křeslo 1
-                objs.push(new fabric.Rect({ left: 2.4*PPM, top: 0.2*PPM, width: 0.8*PPM, height: 0.8*PPM, fill: '#4b5563', rx: 3, ry: 3 })); // křeslo 2
+                objs.push(new fabric.Rect({ width: 3*PPM, height: 1*PPM, fill: '#4b5563', rx: 5 })); // Gauč
+                objs.push(new fabric.Rect({ left: -25, top: 25, width: 1*PPM, height: 1*PPM, fill: '#4b5563', rx: 5 })); // Křeslo
+                objs.push(new fabric.Rect({ left: 25, top: 25, width: 1*PPM, height: 1*PPM, fill: '#4b5563', rx: 5 })); // Křeslo
                 break;
             case 'trash':
-                w = 2*PPM; h = 0.8*PPM; labelText = 'Popelnice';
-                objs.push(new fabric.Rect({ left: 0, top: 0, width: w, height: h, fill: 'transparent' })); // wrapper
-                objs.push(new fabric.Rect({ left: 0, top: 0.1*PPM, width: 0.6*PPM, height: 0.6*PPM, fill: '#374151', rx: 2, ry: 2 }));
-                objs.push(new fabric.Rect({ left: 0.7*PPM, top: 0.1*PPM, width: 0.6*PPM, height: 0.6*PPM, fill: '#1f2937', rx: 2, ry: 2 }));
-                objs.push(new fabric.Rect({ left: 1.4*PPM, top: 0.1*PPM, width: 0.6*PPM, height: 0.6*PPM, fill: '#4b5563', rx: 2, ry: 2 }));
+                for(let i=0; i<3; i++) {
+                    objs.push(new fabric.Rect({ left: i*15 - 15, width: 12, height: 12, fill: '#334155', rx: 2 }));
+                }
                 break;
         }
 
-        if(labelText) {
-            objs.push(new fabric.Text(labelText, {
-                left: w/2, top: h/2, fontSize: 11, fontFamily: 'sans-serif',
-                fill: '#000', textAlign: 'center', originX: 'center', originY: 'center',
-                textBackgroundColor: 'rgba(255,255,255,0.6)'
-            }));
+        if(label) {
+            objs.push(createText(label).set({ top: 0 }));
         }
 
         const group = new fabric.Group(objs, {
             left: canvas.width / 2, top: canvas.height / 2,
-            originX: 'center', originY: 'center',
-            hasControls: true, transparentCorners: false
+            originX: 'center', originY: 'center'
         });
-
         canvas.add(group);
         canvas.setActiveObject(group);
     }
 
-    // --- 4. VLASTNÍ PRVEK ---
+    // --- 5. VLASTNÍ PRVEK ---
     function addCustomShape() {
         const wVal = parseFloat(document.getElementById('custom-w').value);
         const hVal = parseFloat(document.getElementById('custom-h').value);
         const label = document.getElementById('custom-label').value || 'Objekt';
         
-        if(!wVal || !hVal || wVal <= 0 || hVal <= 0) {
-            alert('Zadejte platné rozměry v metrech (např. 6 a 2).');
-            return;
-        }
+        if(!wVal || !hVal) return alert('Zadejte rozměry');
 
         const w = wVal * PPM;
         const h = hVal * PPM;
 
-        const shape = new fabric.Rect({ left: 0, top: 0, width: w, height: h, fill: '#cbd5e1', stroke: '#64748b', strokeWidth: 2 });
-        const text = new fabric.Text(label + `\n(${wVal}x${hVal}m)`, {
-            left: w/2, top: h/2, fontSize: 12, fontFamily: 'sans-serif', fill: '#000',
-            textAlign: 'center', originX: 'center', originY: 'center'
-        });
+        const rect = new fabric.Rect({ width: w, height: h, fill: '#cbd5e1', stroke: '#64748b', strokeWidth: 1 });
+        const text = createText(label + `\n(${wVal}x${hVal}m)`, 10);
 
-        const group = new fabric.Group([shape, text], {
+        const group = new fabric.Group([rect, text], {
             left: canvas.width / 2, top: canvas.height / 2,
-            originX: 'center', originY: 'center',
-            hasControls: true
+            originX: 'center', originY: 'center'
         });
-
         canvas.add(group);
         canvas.setActiveObject(group);
     }
 
-    // --- 5. OVLÁDÁNÍ A MAZÁNÍ ---
+    // --- OSTATNÍ FUNKCE (MAZÁNÍ, EXPORT) ---
     function deleteSelected() {
-        const activeObject = canvas.getActiveObject();
-        if (activeObject) {
-            canvas.remove(activeObject);
-            canvas.discardActiveObject();
-        }
+        const active = canvas.getActiveObject();
+        if (active) { canvas.remove(active); canvas.discardActiveObject(); }
     }
 
-    window.addEventListener('keydown', function(e) {
-        if (e.key === 'Delete' || e.key === 'Backspace') {
-            if (e.target.tagName !== 'INPUT') {
-                deleteSelected();
-                e.preventDefault();
-            }
-        }
-    });
+    window.addEventListener('keydown', (e) => { if (e.key === 'Delete') deleteSelected(); });
 
-    canvas.on('mouse:down', function(options) {
-        if(options.target && options.target.selectable) {
-            options.target.bringToFront();
-        }
-    });
-
-    // --- 6. EXPORT / IMPORT ---
     function exportJSON() {
-        const json = canvas.toJSON();
-        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(json));
-        const dlAnchorElem = document.createElement('a');
-        dlAnchorElem.setAttribute("href", dataStr);
-        dlAnchorElem.setAttribute("download", "navrh-pozemku.json");
-        dlAnchorElem.click();
+        const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(canvas.toJSON()));
+        const dl = document.createElement('a');
+        dl.setAttribute("href", dataStr); dl.setAttribute("download", "navrh.json"); dl.click();
     }
 
     function importJSON(event) {
-        const file = event.target.files[0];
-        if (!file) return;
-
         const reader = new FileReader();
-        reader.onload = function(f) {
-            const data = f.target.result;
-            canvas.loadFromJSON(data, function() {
+        reader.onload = (f) => {
+            canvas.loadFromJSON(f.target.result, () => {
                 canvas.renderAll();
-                const objects = canvas.getObjects();
-                for(let i = 0; i < 3; i++) {
-                    if(objects[i]) {
-                        objects[i].set({selectable: false, evented: false});
-                        canvas.sendToBack(objects[i]);
-                    }
-                }
+                canvas.getObjects().forEach((obj, i) => { if(i<2) { obj.set({selectable:false, evented:false}); canvas.sendToBack(obj); } });
             });
         };
-        reader.readAsText(file);
+        reader.readAsText(event.target.files[0]);
     }
 
     function exportPDF() {
-        canvas.discardActiveObject();
-        canvas.renderAll();
+        canvas.discardActiveObject().renderAll();
         const { jsPDF } = window.jspdf;
         const doc = new jsPDF({ orientation: 'landscape', unit: 'px', format: [canvas.width, canvas.height] });
-        const imgData = canvas.toDataURL({ format: 'jpeg', quality: 1.0 });
-        doc.addImage(imgData, 'JPEG', 0, 0, canvas.width, canvas.height);
-        doc.save('muj-navrh-pozemku.pdf');
+        doc.addImage(canvas.toDataURL({ format: 'jpeg', quality: 1.0 }), 'JPEG', 0, 0, canvas.width, canvas.height);
+        doc.save('navrh-pozemku.pdf');
     }
 </script>
 </body>
