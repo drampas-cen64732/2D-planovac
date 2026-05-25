@@ -2,18 +2,1762 @@
 <html lang="cs">
   <head>
     <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>ERSTE PREMIER · Zpětné modelace</title>
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link
       href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@500;600;700&family=Inter:wght@400;500;600;700&display=swap"
       rel="stylesheet"
     />
+
+    <!-- Tailwind CSS (CDN) -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "ep-navy": "#0a1e3f",
+              "ep-blue": "#143a73",
+              "ep-blue-light": "#1e5fb8",
+              "ep-gold": "#c9a96e",
+              "ep-sapphire": "#1e6dd4",
+              "ep-slate": "#1c2536",
+              "ep-slate-light": "#2a364d",
+            },
+            fontFamily: {
+              serif: ["'Cormorant Garamond'", "Georgia", "serif"],
+              sans: ["Inter", "system-ui", "sans-serif"],
+            },
+            boxShadow: {
+              premium:
+                "0 10px 40px -10px rgba(10, 30, 63, 0.35), 0 2px 6px -2px rgba(10, 30, 63, 0.15)",
+              "premium-hover":
+                "0 20px 60px -15px rgba(10, 30, 63, 0.45), 0 4px 10px -2px rgba(10, 30, 63, 0.2)",
+            },
+            backgroundImage: {
+              "ep-gradient": "linear-gradient(135deg, #0a1e3f 0%, #143a73 100%)",
+              "ep-radial":
+                "radial-gradient(ellipse at top, rgba(201,169,110,0.08), transparent 60%)",
+            },
+          },
+        },
+      };
+    </script>
+
+    <style>
+      body {
+        font-family: "Inter", system-ui, sans-serif;
+        background: #f6f8fc;
+        color: #0f172a;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+      .ep-text-navy {
+        color: #0a1e3f;
+      }
+      /* Custom range slider */
+      input[type="range"].ep-slider {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 100%;
+        height: 6px;
+        background: linear-gradient(
+          to right,
+          #143a73 var(--val, 0%),
+          rgba(148, 163, 184, 0.35) var(--val, 0%)
+        );
+        border-radius: 9999px;
+        outline: none;
+        transition: background 0.15s ease;
+      }
+      input[type="range"].ep-slider::-webkit-slider-thumb {
+        -webkit-appearance: none;
+        appearance: none;
+        width: 20px;
+        height: 20px;
+        border-radius: 9999px;
+        background: #ffffff;
+        border: 2px solid #143a73;
+        box-shadow: 0 2px 8px rgba(10, 30, 63, 0.35);
+        cursor: pointer;
+        transition: transform 0.15s ease, box-shadow 0.15s ease;
+      }
+      input[type="range"].ep-slider::-webkit-slider-thumb:hover {
+        transform: scale(1.1);
+        box-shadow: 0 4px 12px rgba(10, 30, 63, 0.45);
+      }
+      input[type="range"].ep-slider::-moz-range-thumb {
+        width: 20px;
+        height: 20px;
+        border-radius: 9999px;
+        background: #ffffff;
+        border: 2px solid #143a73;
+        box-shadow: 0 2px 8px rgba(10, 30, 63, 0.35);
+        cursor: pointer;
+      }
+      ::-webkit-scrollbar {
+        width: 10px;
+        height: 10px;
+      }
+      ::-webkit-scrollbar-thumb {
+        background: rgba(148, 163, 184, 0.4);
+        border-radius: 9999px;
+      }
+      ::-webkit-scrollbar-thumb:hover {
+        background: rgba(100, 116, 139, 0.6);
+      }
+      .fade-in {
+        animation: fadeIn 0.45s ease-out both;
+      }
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(6px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+      /* Hide number input arrows for the investment amount input */
+      .no-spin::-webkit-outer-spin-button,
+      .no-spin::-webkit-inner-spin-button {
+        -webkit-appearance: none;
+        margin: 0;
+      }
+      .no-spin {
+        -moz-appearance: textfield;
+      }
+      /* Bootstrap loader while React boots */
+      #boot-loader {
+        position: fixed;
+        inset: 0;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        background: linear-gradient(135deg, #0a1e3f 0%, #143a73 100%);
+        color: #c9a96e;
+        font-family: "Cormorant Garamond", serif;
+        letter-spacing: 0.32em;
+        z-index: 9999;
+        transition: opacity 0.4s ease;
+      }
+    </style>
   </head>
   <body>
+    <div id="boot-loader">ERSTE&nbsp;PREMIER · načítání…</div>
     <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
+
+    <!-- React & ReactDOM 18 (UMD) -->
+    <script
+      crossorigin
+      src="https://unpkg.com/react@18.3.1/umd/react.production.min.js"
+    ></script>
+    <script
+      crossorigin
+      src="https://unpkg.com/react-dom@18.3.1/umd/react-dom.production.min.js"
+    ></script>
+
+    <!-- PropTypes is required by Recharts UMD -->
+    <script
+      crossorigin
+      src="https://unpkg.com/prop-types@15.8.1/prop-types.min.js"
+    ></script>
+
+    <!-- Recharts 2.x (UMD) -->
+    <script
+      crossorigin
+      src="https://unpkg.com/recharts@2.13.3/umd/Recharts.js"
+    ></script>
+
+    <!-- Babel standalone for in-browser JSX -->
+    <script src="https://unpkg.com/@babel/standalone@7.25.6/babel.min.js"></script>
+
+    <!-- ===================================================================
+         APPLICATION SOURCE
+         =================================================================== -->
+    <script type="text/babel" data-type="module" data-presets="react">
+      "use strict";
+
+      const { useState, useMemo, useEffect, useRef, useContext, createContext } =
+        React;
+      const {
+        ResponsiveContainer,
+        AreaChart,
+        Area,
+        XAxis,
+        YAxis,
+        CartesianGrid,
+        Tooltip,
+        Legend,
+        PieChart,
+        Pie,
+        Cell,
+      } = Recharts;
+
+      /* ------------------------------------------------------------------ */
+      /*  Inline lucide-style icons (small SVG components)                  */
+      /* ------------------------------------------------------------------ */
+      const baseIconProps = {
+        xmlns: "http://www.w3.org/2000/svg",
+        width: 24,
+        height: 24,
+        viewBox: "0 0 24 24",
+        fill: "none",
+        stroke: "currentColor",
+        strokeWidth: 1.7,
+        strokeLinecap: "round",
+        strokeLinejoin: "round",
+      };
+      const Icon = ({ paths, className = "", size = 18, strokeWidth = 1.7 }) => (
+        <svg
+          {...baseIconProps}
+          width={size}
+          height={size}
+          strokeWidth={strokeWidth}
+          className={className}
+        >
+          {paths}
+        </svg>
+      );
+      const TrendingUpIcon = (p) => (
+        <Icon
+          {...p}
+          paths={
+            <>
+              <polyline points="22 7 13.5 15.5 8.5 10.5 2 17" />
+              <polyline points="16 7 22 7 22 13" />
+            </>
+          }
+        />
+      );
+      const CoinsIcon = (p) => (
+        <Icon
+          {...p}
+          paths={
+            <>
+              <circle cx="8" cy="8" r="6" />
+              <path d="M18.09 10.37A6 6 0 1 1 10.34 18" />
+              <path d="M7 6h1v4" />
+              <path d="M16.71 13.88l.7.71-2.82 2.82" />
+            </>
+          }
+        />
+      );
+      const ChevronDownIcon = (p) => (
+        <Icon {...p} paths={<polyline points="6 9 12 15 18 9" />} />
+      );
+      const BarChart3Icon = (p) => (
+        <Icon
+          {...p}
+          paths={
+            <>
+              <path d="M3 3v18h18" />
+              <path d="M18 17V9" />
+              <path d="M13 17V5" />
+              <path d="M8 17v-3" />
+            </>
+          }
+        />
+      );
+      const Settings2Icon = (p) => (
+        <Icon
+          {...p}
+          paths={
+            <>
+              <path d="M20 7h-9" />
+              <path d="M14 17H5" />
+              <circle cx="17" cy="17" r="3" />
+              <circle cx="7" cy="7" r="3" />
+            </>
+          }
+        />
+      );
+      const ShieldIcon = (p) => (
+        <Icon
+          {...p}
+          paths={
+            <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z" />
+          }
+        />
+      );
+      const SparklesIcon = (p) => (
+        <Icon
+          {...p}
+          paths={
+            <>
+              <path d="M12 3l1.7 4.6L18 9l-4.3 1.4L12 15l-1.7-4.6L6 9l4.3-1.4z" />
+              <path d="M19 14l.9 2.4L22 17l-2.1.6L19 20l-.9-2.4L16 17l2.1-.6z" />
+              <path d="M5 16l.6 1.6L7 18l-1.4.4L5 20l-.6-1.6L3 18l1.4-.4z" />
+            </>
+          }
+        />
+      );
+      const ZapIcon = (p) => (
+        <Icon
+          {...p}
+          paths={<polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2" />}
+        />
+      );
+      const CheckCircle2Icon = (p) => (
+        <Icon
+          {...p}
+          paths={
+            <>
+              <circle cx="12" cy="12" r="10" />
+              <polyline points="8 12 11 15 16 9" />
+            </>
+          }
+        />
+      );
+      const AlertTriangleIcon = (p) => (
+        <Icon
+          {...p}
+          paths={
+            <>
+              <path d="M10.29 3.86 1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z" />
+              <line x1="12" y1="9" x2="12" y2="13" />
+              <circle cx="12" cy="17" r="0.5" />
+            </>
+          }
+        />
+      );
+      const PlayCircleIcon = (p) => (
+        <Icon
+          {...p}
+          paths={
+            <>
+              <circle cx="12" cy="12" r="10" />
+              <polygon points="10 8 16 12 10 16 10 8" />
+            </>
+          }
+        />
+      );
+      const RotateCcwIcon = (p) => (
+        <Icon
+          {...p}
+          paths={
+            <>
+              <polyline points="1 4 1 10 7 10" />
+              <path d="M3.51 15a9 9 0 1 0 2.13-9.36L1 10" />
+            </>
+          }
+        />
+      );
+      const ScaleIcon = (p) => (
+        <Icon
+          {...p}
+          paths={
+            <>
+              <path d="M12 3v18" />
+              <path d="M7 21h10" />
+              <path d="M7 6l5-3 5 3" />
+              <path d="M5 11l2-5 2 5a2 2 0 1 1-4 0z" />
+              <path d="M15 11l2-5 2 5a2 2 0 1 1-4 0z" />
+            </>
+          }
+        />
+      );
+      const LineChartIcon = (p) => (
+        <Icon
+          {...p}
+          paths={
+            <>
+              <path d="M3 3v18h18" />
+              <polyline points="7 14 11 10 14 13 20 7" />
+            </>
+          }
+        />
+      );
+
+      /* ------------------------------------------------------------------ */
+      /*  Mock historical monthly returns (% per month) — 2021 → Q1 2026    */
+      /*  63 monthly samples per asset class.                               */
+      /* ------------------------------------------------------------------ */
+
+      const ASSET_CLASSES = {
+        stocks: {
+          key: "stocks",
+          label: "Globální Akcie (ETF)",
+          shortLabel: "Akcie",
+          description: "Diverzifikované globální akciové ETF (MSCI World)",
+          color: "#1e5fb8",
+          volatility: 15.8,
+        },
+        bonds: {
+          key: "bonds",
+          label: "Korporátní Dluhopisy",
+          shortLabel: "Dluhopisy",
+          description: "Investiční stupeň, krátká až střední durace",
+          color: "#0a1e3f",
+          volatility: 5.2,
+        },
+        realEstate: {
+          key: "realEstate",
+          label: "Nemovitostní fondy",
+          shortLabel: "Reality",
+          description: "REIT / nemovitostní fondy komerčních nemovitostí",
+          color: "#c9a96e",
+          volatility: 11.4,
+        },
+        commodities: {
+          key: "commodities",
+          label: "Komodity & Zlato",
+          shortLabel: "Komodity",
+          description: "Diverzifikovaný komoditní koš s expozicí na zlato",
+          color: "#a16207",
+          volatility: 14.2,
+        },
+        cash: {
+          key: "cash",
+          label: "Peněžní trh / Hotovost",
+          shortLabel: "Hotovost",
+          description: "Repo sazba ČNB / krátké instrumenty peněžního trhu",
+          color: "#64748b",
+          volatility: 0.6,
+        },
+        alternatives: {
+          key: "alternatives",
+          label: "Alternativní investice",
+          shortLabel: "Alternativy",
+          description: "Hedge fondy, private equity, infrastruktura",
+          color: "#7c3aed",
+          volatility: 9.5,
+        },
+        crypto: {
+          key: "crypto",
+          label: "Krypto aktiva",
+          shortLabel: "Krypto",
+          description: "Bitcoin a vybraná digitální aktiva",
+          color: "#f59e0b",
+          volatility: 62.0,
+        },
+      };
+
+      // prettier-ignore
+      const HISTORICAL_RETURNS = {
+        stocks: [
+          1.8, 2.5, 4.1, 5.0, 0.7, 2.3, 2.4, 2.9, -4.0, 6.8, -0.6, 4.6,
+          -5.2, -2.8, 3.6, -8.7, 0.4, -8.2, 9.0, -4.0, -9.1, 8.1, 5.5, -5.9,
+          6.3, -2.5, 3.7, 1.6, 0.5, 6.5, 3.2, -1.5, -4.9, -2.1, 9.0, 4.5,
+          1.7, 5.3, 3.2, -4.1, 4.9, 3.5, 1.2, 2.4, 2.1, -1.0, 5.9, -2.4,
+          3.0, -1.2, 1.6, 2.8, 1.4, -2.0, 0.8, 2.2, -1.5, 3.4, 0.6, -0.7,
+          1.2, 0.7, 1.5,
+        ],
+        bonds: [
+          -0.7, -1.5, -1.2, 0.7, 0.3, 0.7, 1.1, -0.4, -1.0, -0.3, 0.4, -0.3,
+          -2.0, -1.1, -2.8, -3.8, 0.6, -1.6, 2.4, -2.9, -4.3, -1.3, 3.7, -0.5,
+          3.2, -2.6, 2.8, 0.6, -1.1, -0.4, 0.1, -0.6, -2.5, 1.3, 4.5, 3.8,
+          -0.3, -1.4, 0.9, -2.5, 1.7, 0.9, 2.4, 1.5, 1.2, -1.6, 1.1, 0.4,
+          0.7, 0.5, 0.3, 0.6, 0.4, -0.4, 0.5, 0.6, 0.2, 0.3, 0.5, 0.2,
+          0.4, 0.3, 0.3,
+        ],
+        realEstate: [
+          0.5, 4.2, 4.8, 7.9, 0.8, 2.6, 4.5, 2.0, -5.5, 7.4, -0.8, 9.6,
+          -7.3, -2.9, 6.8, -3.7, -4.5, -7.8, 8.4, -5.8, -12.6, 3.6, 5.0, -4.6,
+          10.1, -5.0, -1.2, 1.0, -3.7, 5.5, 2.5, -3.0, -7.5, -4.0, 11.3, 8.7,
+          -4.5, 1.6, 1.8, -7.7, 4.8, 2.1, 6.9, 5.7, 3.0, -3.6, 4.5, -2.6,
+          1.5, -0.7, 2.3, 1.0, 0.8, -1.2, 0.9, 1.8, -0.5, 1.0, 0.4, -0.2,
+          1.0, 0.5, 0.7,
+        ],
+        commodities: [
+          3.5, 6.2, -1.3, 8.3, 2.7, 1.9, 1.6, -2.3, 4.9, 3.5, -7.3, 3.5,
+          8.0, 6.2, 8.6, 4.1, 1.5, -10.9, -5.7, -1.1, -8.1, 2.0, 2.7, -1.6,
+          -2.6, -4.6, -3.1, 0.7, -6.0, 4.0, 6.5, -0.5, -0.7, -1.7, -1.6, 2.6,
+          -0.5, -1.4, 4.2, 2.4, 1.8, -1.5, 3.9, 0.8, 5.5, 2.1, 0.7, -2.5,
+          2.0, -1.0, 1.4, 0.8, -0.5, 1.6, 0.4, -0.8, 1.0, 0.9, 0.2, -0.3,
+          1.5, 0.8, 0.4,
+        ],
+        cash: [
+          0.02, 0.02, 0.02, 0.04, 0.05, 0.06, 0.08, 0.1, 0.12, 0.14, 0.18, 0.22,
+          0.25, 0.3, 0.35, 0.45, 0.5, 0.55, 0.55, 0.55, 0.55, 0.55, 0.6, 0.6,
+          0.6, 0.58, 0.58, 0.58, 0.58, 0.55, 0.55, 0.55, 0.55, 0.52, 0.5, 0.48,
+          0.45, 0.42, 0.4, 0.4, 0.38, 0.36, 0.34, 0.32, 0.3, 0.3, 0.28, 0.28,
+          0.27, 0.27, 0.26, 0.26, 0.25, 0.25, 0.25, 0.25, 0.24, 0.24, 0.23, 0.23,
+          0.22, 0.22, 0.22,
+        ],
+        alternatives: [
+          1.3, 1.6, 2.0, 2.1, 0.7, 1.2, 1.0, 1.3, -1.4, 2.6, 0.1, 1.8,
+          -2.0, -0.9, 1.8, -3.8, 0.3, -3.1, 3.7, -1.4, -3.5, 3.4, 2.1, -2.0,
+          2.4, -0.6, 1.6, 0.9, 0.5, 2.5, 1.4, -0.4, -1.6, -0.6, 3.4, 1.7,
+          0.9, 1.9, 1.3, -1.0, 1.9, 1.5, 0.7, 1.1, 1.1, -0.2, 2.1, -0.6,
+          1.2, -0.3, 0.7, 1.1, 0.6, -0.5, 0.5, 1.0, -0.3, 1.2, 0.4, -0.1,
+          0.6, 0.4, 0.6,
+        ],
+        crypto: [
+          14.0, 36.0, 30.0, -1.5, -35.0, -6.0, 18.0, 13.0, -7.0, 40.0, -7.0, -19.0,
+          -16.0, 12.0, 5.0, -17.0, -16.0, -37.0, 17.0, -14.0, -3.0, 5.0, -16.0, -3.0,
+          39.0, 0.0, 23.0, 3.0, -7.0, 12.0, -4.0, -11.0, 4.0, 28.0, 9.0, 12.0,
+          0.0, 43.0, 16.0, -15.0, 11.0, -7.0, 3.0, -8.0, 7.0, 11.0, 38.0, -3.0,
+          5.0, -7.0, 4.0, 9.0, 2.0, -6.0, 1.0, 7.0, -4.0, 8.0, -2.0, -3.0,
+          3.0, -1.0, 4.0,
+        ],
+      };
+
+      // Benchmark series (simulated S&P 500 + monthly inflation)
+      const BENCHMARK_SP500 = HISTORICAL_RETURNS.stocks.map(
+        (v) => v * 1.05 + 0.05
+      );
+      // prettier-ignore
+      const BENCHMARK_INFLATION = [
+        0.2, 0.2, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.3, 0.4, 0.4, 0.4,
+        0.9, 1.0, 1.1, 1.2, 1.3, 1.3, 1.3, 1.2, 1.1, 1.1, 1.0, 1.0,
+        1.0, 0.9, 0.9, 0.8, 0.8, 0.8, 0.8, 0.8, 0.8, 0.7, 0.7, 0.7,
+        0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2,
+        0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2, 0.2,
+        0.2, 0.2, 0.2,
+      ];
+
+      function buildMonthlyTimeline() {
+        const start = new Date(2021, 0, 1);
+        const length = HISTORICAL_RETURNS.stocks.length;
+        const out = [];
+        for (let i = 0; i < length; i++) {
+          const d = new Date(start.getFullYear(), start.getMonth() + i, 1);
+          out.push({
+            date: d,
+            label: d.toLocaleDateString("cs-CZ", {
+              month: "short",
+              year: "numeric",
+            }),
+          });
+        }
+        return out;
+      }
+
+      const TIMELINE = buildMonthlyTimeline();
+
+      /* ------------------------------------------------------------------ */
+      /*  Portfolio math                                                     */
+      /* ------------------------------------------------------------------ */
+      function weightedMonthlyReturns(allocation) {
+        const out = new Array(TIMELINE.length).fill(0);
+        Object.keys(allocation).forEach((key) => {
+          const weight = (allocation[key] || 0) / 100;
+          if (weight <= 0) return;
+          const series = HISTORICAL_RETURNS[key];
+          if (!series) return;
+          for (let i = 0; i < series.length; i++) {
+            out[i] += series[i] * weight;
+          }
+        });
+        return out;
+      }
+      function compoundSeries(initial, monthlyPct) {
+        const values = [];
+        let val = initial;
+        for (const r of monthlyPct) {
+          val = val * (1 + r / 100);
+          values.push(val);
+        }
+        return values;
+      }
+      function buildPerformanceSeries(allocation, initialInvestment) {
+        const monthly = weightedMonthlyReturns(allocation);
+        const portfolio = compoundSeries(initialInvestment, monthly);
+        const benchmark = compoundSeries(initialInvestment, BENCHMARK_SP500);
+        const inflation = compoundSeries(
+          initialInvestment,
+          BENCHMARK_INFLATION.map((v) => -v)
+        );
+        return TIMELINE.map((t, i) => ({
+          date: t.label,
+          portfolio: portfolio[i],
+          benchmark: benchmark[i],
+          inflation: inflation[i],
+          ts: t.date.getTime(),
+        }));
+      }
+      function annualisedReturn(start, end, months) {
+        if (start <= 0 || months <= 0) return 0;
+        const years = months / 12;
+        return (Math.pow(end / start, 1 / years) - 1) * 100;
+      }
+      function stddev(values) {
+        if (!values.length) return 0;
+        const mean = values.reduce((a, b) => a + b, 0) / values.length;
+        const v =
+          values.reduce((a, b) => a + (b - mean) * (b - mean), 0) /
+          values.length;
+        return Math.sqrt(v);
+      }
+      function computeStats(allocation, initialInvestment) {
+        const monthly = weightedMonthlyReturns(allocation);
+        const values = compoundSeries(initialInvestment, monthly);
+        const months = monthly.length;
+        const finalValue = values[values.length - 1];
+        const totalReturn =
+          ((finalValue - initialInvestment) / initialInvestment) * 100;
+        const cagr = annualisedReturn(initialInvestment, finalValue, months);
+        const volatility = stddev(monthly) * Math.sqrt(12);
+        const meanCash =
+          HISTORICAL_RETURNS.cash.reduce((a, b) => a + b, 0) /
+          HISTORICAL_RETURNS.cash.length;
+        const riskFreeAnnual = meanCash * 12;
+        const sharpe =
+          volatility > 0 ? (cagr - riskFreeAnnual) / volatility : 0;
+        let peak = values[0];
+        let maxDD = 0;
+        for (const v of values) {
+          if (v > peak) peak = v;
+          const dd = (v - peak) / peak;
+          if (dd < maxDD) maxDD = dd;
+        }
+        const perf = (n) => {
+          const idx = values.length - 1 - n;
+          if (idx < 0) return 0;
+          return annualisedReturn(values[idx], values[values.length - 1], n);
+        };
+        return {
+          cagr,
+          volatility,
+          sharpe,
+          maxDrawdown: maxDD * 100,
+          totalReturn,
+          performance1y: perf(12),
+          performance3y: perf(36),
+          performance5y: perf(60),
+          finalValue,
+        };
+      }
+      function allocationSum(a) {
+        return Object.keys(a).reduce((s, k) => s + (a[k] || 0), 0);
+      }
+      function allocationEntries(a) {
+        return Object.keys(a)
+          .filter((k) => (a[k] || 0) > 0)
+          .map((k) => ({
+            key: k,
+            weight: a[k] || 0,
+            meta: ASSET_CLASSES[k],
+          }));
+      }
+
+      /* ------------------------------------------------------------------ */
+      /*  Preset portfolios                                                  */
+      /* ------------------------------------------------------------------ */
+      const PRESET_PORTFOLIOS = [
+        {
+          id: "conservative",
+          name: "Konzervativní profil",
+          tagline:
+            "Pro klienty preferující stabilitu kapitálu a pravidelný výnos.",
+          riskLabel: "Nízké riziko",
+          riskLevel: 2,
+          allocation: { stocks: 20, bonds: 70, alternatives: 10 },
+        },
+        {
+          id: "balanced",
+          name: "Vyvážený profil",
+          tagline:
+            "Vyvážená kombinace růstu a ochrany kapitálu pro dlouhodobý horizont.",
+          riskLabel: "Střední riziko",
+          riskLevel: 3,
+          allocation: { stocks: 50, bonds: 40, commodities: 10 },
+        },
+        {
+          id: "dynamic",
+          name: "Dynamický profil",
+          tagline:
+            "Maximální růstový potenciál pro klienty s dlouhodobým horizontem.",
+          riskLabel: "Vysoké riziko",
+          riskLevel: 5,
+          allocation: { stocks: 80, commodities: 15, crypto: 5 },
+        },
+      ];
+
+      /* ------------------------------------------------------------------ */
+      /*  Investment Context (currency + initial amount)                     */
+      /* ------------------------------------------------------------------ */
+      const FX_CZK_TO_EUR = 0.04;
+      const InvestmentContext = createContext(null);
+
+      function InvestmentProvider({ children }) {
+        const [currency, setCurrencyState] = useState("CZK");
+        const [initialInvestment, setInitialInvestment] = useState(1_000_000);
+
+        const setCurrency = (next) => {
+          setCurrencyState((prev) => {
+            if (prev === next) return prev;
+            setInitialInvestment((amount) => {
+              if (prev === "CZK" && next === "EUR")
+                return Math.round(amount * FX_CZK_TO_EUR);
+              if (prev === "EUR" && next === "CZK")
+                return Math.round(amount / FX_CZK_TO_EUR);
+              return amount;
+            });
+            return next;
+          });
+        };
+
+        const value = useMemo(() => {
+          const formatMoney = (amount, opts) => {
+            const locale = currency === "CZK" ? "cs-CZ" : "de-DE";
+            return new Intl.NumberFormat(locale, {
+              style: "currency",
+              currency,
+              maximumFractionDigits: 0,
+              notation: opts && opts.compact ? "compact" : "standard",
+            }).format(amount);
+          };
+          return {
+            currency,
+            setCurrency,
+            initialInvestment,
+            setInitialInvestment,
+            fxRate: FX_CZK_TO_EUR,
+            formatMoney,
+          };
+        }, [currency, initialInvestment]);
+
+        return (
+          <InvestmentContext.Provider value={value}>
+            {children}
+          </InvestmentContext.Provider>
+        );
+      }
+      function useInvestment() {
+        const ctx = useContext(InvestmentContext);
+        if (!ctx)
+          throw new Error("useInvestment must be used within InvestmentProvider");
+        return ctx;
+      }
+
+      /* ------------------------------------------------------------------ */
+      /*  Header                                                             */
+      /* ------------------------------------------------------------------ */
+      function Header() {
+        const {
+          currency,
+          setCurrency,
+          initialInvestment,
+          setInitialInvestment,
+        } = useInvestment();
+
+        const handleAmount = (e) => {
+          const raw = String(e.target.value).replace(/[^\d]/g, "");
+          const parsed = Number(raw);
+          if (!Number.isFinite(parsed)) return;
+          setInitialInvestment(Math.max(0, parsed));
+        };
+
+        const minStep = currency === "CZK" ? 50000 : 2000;
+
+        return (
+          <header className="sticky top-0 z-40 bg-ep-gradient text-white shadow-premium">
+            <div className="absolute inset-0 bg-ep-radial pointer-events-none" />
+            <div className="relative mx-auto flex max-w-[1400px] flex-col gap-4 px-5 py-4 md:flex-row md:items-center md:justify-between md:px-10 md:py-5">
+              <div className="flex items-center gap-4">
+                <div className="flex h-11 w-11 items-center justify-center rounded-md border border-ep-gold/40 bg-white/5 backdrop-blur">
+                  <TrendingUpIcon size={20} className="text-ep-gold" />
+                </div>
+                <div className="leading-tight">
+                  <div className="font-serif text-xl font-semibold tracking-[0.18em] text-white md:text-2xl">
+                    ERSTE&nbsp;PREMIER
+                  </div>
+                  <div className="text-[11px] uppercase tracking-[0.32em] text-ep-gold/90 md:text-xs">
+                    Zpětné modelace
+                  </div>
+                </div>
+              </div>
+
+              <div className="flex flex-col items-stretch gap-3 sm:flex-row sm:items-center sm:gap-4">
+                <div
+                  className="inline-flex items-center rounded-full border border-white/15 bg-white/5 p-1 backdrop-blur"
+                  role="tablist"
+                  aria-label="Volba měny"
+                >
+                  {["CZK", "EUR"].map((c) => {
+                    const active = currency === c;
+                    return (
+                      <button
+                        key={c}
+                        type="button"
+                        role="tab"
+                        aria-selected={active}
+                        onClick={() => setCurrency(c)}
+                        className={
+                          "rounded-full px-4 py-1.5 text-xs font-semibold tracking-wider transition-all " +
+                          (active
+                            ? "bg-ep-gold text-ep-navy shadow-md"
+                            : "text-white/70 hover:text-white")
+                        }
+                      >
+                        {c}
+                      </button>
+                    );
+                  })}
+                </div>
+
+                <label className="group flex items-center gap-2 rounded-xl border border-white/15 bg-white/5 px-3 py-2 backdrop-blur transition focus-within:border-ep-gold/70 focus-within:bg-white/10">
+                  <CoinsIcon size={16} className="text-ep-gold" />
+                  <span className="hidden text-[10px] uppercase tracking-[0.28em] text-white/60 md:inline">
+                    Počáteční investice
+                  </span>
+                  <input
+                    type="text"
+                    inputMode="numeric"
+                    aria-label="Počáteční investice"
+                    value={initialInvestment.toLocaleString(
+                      currency === "CZK" ? "cs-CZ" : "de-DE"
+                    )}
+                    onChange={handleAmount}
+                    className="w-32 bg-transparent text-right font-semibold text-white outline-none placeholder:text-white/40 md:w-36"
+                  />
+                  <span className="text-xs font-semibold tracking-wider text-ep-gold/90">
+                    {currency}
+                  </span>
+                </label>
+
+                <div className="hidden gap-1 sm:flex">
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setInitialInvestment(
+                        Math.max(0, initialInvestment - minStep)
+                      )
+                    }
+                    className="rounded-md border border-white/15 px-2 py-1 text-xs text-white/70 transition hover:bg-white/10 hover:text-white"
+                    aria-label="Snížit počáteční investici"
+                  >
+                    −
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setInitialInvestment(initialInvestment + minStep)
+                    }
+                    className="rounded-md border border-white/15 px-2 py-1 text-xs text-white/70 transition hover:bg-white/10 hover:text-white"
+                    aria-label="Zvýšit počáteční investici"
+                  >
+                    +
+                  </button>
+                </div>
+              </div>
+            </div>
+          </header>
+        );
+      }
+
+      /* ------------------------------------------------------------------ */
+      /*  Performance Chart                                                  */
+      /* ------------------------------------------------------------------ */
+      function EpTooltip({ active, payload, label, benchmarkLabel }) {
+        const { formatMoney } = useInvestment();
+        if (!active || !payload || !payload.length) return null;
+        const find = (k) => payload.find((p) => p.dataKey === k);
+        const Row = ({ color, lbl, value }) => (
+          <div className="flex items-center justify-between gap-6 py-0.5 text-sm">
+            <span className="flex items-center gap-2 text-slate-600">
+              <span
+                className="h-2.5 w-2.5 rounded-full"
+                style={{ backgroundColor: color }}
+              />
+              {lbl}
+            </span>
+            <span className="font-semibold ep-text-navy tabular-nums">
+              {value}
+            </span>
+          </div>
+        );
+        return (
+          <div className="rounded-xl border border-slate-200 bg-white/95 px-4 py-3 shadow-premium backdrop-blur">
+            <div className="mb-1 text-[10px] font-semibold uppercase tracking-widest text-slate-500">
+              {label}
+            </div>
+            {find("portfolio") && (
+              <Row
+                color="#1e5fb8"
+                lbl="Portfolio"
+                value={formatMoney(Number(find("portfolio").value))}
+              />
+            )}
+            {find("benchmark") && (
+              <Row
+                color="#c9a96e"
+                lbl={benchmarkLabel}
+                value={formatMoney(Number(find("benchmark").value))}
+              />
+            )}
+            {find("inflation") && (
+              <Row
+                color="#94a3b8"
+                lbl="Reálná hodnota"
+                value={formatMoney(Number(find("inflation").value))}
+              />
+            )}
+          </div>
+        );
+      }
+
+      function PerformanceChart({
+        allocation,
+        title = "Vývoj investice (modelace)",
+        subtitle = "Hypotetický vývoj počáteční investice — měsíční granularita.",
+        benchmarkLabel = "Benchmark (Index S&P 500)",
+      }) {
+        const { initialInvestment, formatMoney } = useInvestment();
+        const data = useMemo(
+          () => buildPerformanceSeries(allocation, initialInvestment),
+          [allocation, initialInvestment]
+        );
+        const xTicks = useMemo(
+          () => data.filter((_, i) => i % 6 === 0).map((d) => d.date),
+          [data]
+        );
+        const finalValue = data.length
+          ? data[data.length - 1].portfolio
+          : initialInvestment;
+        const totalChange =
+          ((finalValue - initialInvestment) / initialInvestment) * 100;
+        const positive = totalChange >= 0;
+
+        return (
+          <section className="rounded-2xl border border-slate-200 bg-white p-5 shadow-premium md:p-7">
+            <div className="mb-4 flex flex-col gap-1 md:mb-6 md:flex-row md:items-end md:justify-between">
+              <div>
+                <h3 className="text-lg font-semibold ep-text-navy md:text-xl">
+                  {title}
+                </h3>
+                <p className="text-sm text-slate-500">{subtitle}</p>
+              </div>
+              <div className="rounded-xl border border-slate-200 bg-slate-50 px-4 py-2 text-right">
+                <div className="text-[10px] uppercase tracking-widest text-slate-500">
+                  Konečná hodnota
+                </div>
+                <div className="font-semibold ep-text-navy md:text-lg">
+                  {formatMoney(finalValue)}
+                </div>
+                <div
+                  className={
+                    "text-xs font-semibold tabular-nums " +
+                    (positive ? "text-emerald-600" : "text-rose-600")
+                  }
+                >
+                  {positive ? "▲" : "▼"} {totalChange.toFixed(2)} % celkem
+                </div>
+              </div>
+            </div>
+
+            <div className="h-[320px] w-full md:h-[400px]">
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart
+                  data={data}
+                  margin={{ top: 8, right: 16, left: 0, bottom: 0 }}
+                >
+                  <defs>
+                    <linearGradient
+                      id="ep-portfolio-fill"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop offset="0%" stopColor="#1e5fb8" stopOpacity={0.55} />
+                      <stop
+                        offset="100%"
+                        stopColor="#1e5fb8"
+                        stopOpacity={0.02}
+                      />
+                    </linearGradient>
+                    <linearGradient
+                      id="ep-benchmark-fill"
+                      x1="0"
+                      y1="0"
+                      x2="0"
+                      y2="1"
+                    >
+                      <stop offset="0%" stopColor="#c9a96e" stopOpacity={0.35} />
+                      <stop
+                        offset="100%"
+                        stopColor="#c9a96e"
+                        stopOpacity={0.02}
+                      />
+                    </linearGradient>
+                  </defs>
+                  <CartesianGrid
+                    stroke="rgba(148,163,184,0.18)"
+                    vertical={false}
+                  />
+                  <XAxis
+                    dataKey="date"
+                    ticks={xTicks}
+                    tick={{ fontSize: 11, fill: "#64748b" }}
+                    tickLine={false}
+                    axisLine={{ stroke: "rgba(148,163,184,0.3)" }}
+                  />
+                  <YAxis
+                    tickFormatter={(v) =>
+                      formatMoney(v, { compact: true }).replace(/\s/g, "")
+                    }
+                    tick={{ fontSize: 11, fill: "#64748b" }}
+                    tickLine={false}
+                    axisLine={{ stroke: "rgba(148,163,184,0.3)" }}
+                    width={70}
+                  />
+                  <Tooltip
+                    content={<EpTooltip benchmarkLabel={benchmarkLabel} />}
+                    cursor={{
+                      stroke: "#143a73",
+                      strokeOpacity: 0.25,
+                      strokeWidth: 1,
+                    }}
+                  />
+                  <Legend
+                    verticalAlign="top"
+                    height={32}
+                    iconType="circle"
+                    wrapperStyle={{ fontSize: 12, color: "#475569" }}
+                  />
+                  <Area
+                    type="monotone"
+                    name="Vybrané portfolio"
+                    dataKey="portfolio"
+                    stroke="#1e5fb8"
+                    strokeWidth={2.5}
+                    fill="url(#ep-portfolio-fill)"
+                    activeDot={{ r: 4 }}
+                  />
+                  <Area
+                    type="monotone"
+                    name={benchmarkLabel}
+                    dataKey="benchmark"
+                    stroke="#c9a96e"
+                    strokeWidth={2}
+                    strokeDasharray="5 4"
+                    fill="url(#ep-benchmark-fill)"
+                    activeDot={{ r: 3 }}
+                  />
+                  <Area
+                    type="monotone"
+                    name="Reálná hodnota po inflaci"
+                    dataKey="inflation"
+                    stroke="#94a3b8"
+                    strokeWidth={1.5}
+                    strokeDasharray="2 3"
+                    fill="transparent"
+                    activeDot={{ r: 3 }}
+                  />
+                </AreaChart>
+              </ResponsiveContainer>
+            </div>
+          </section>
+        );
+      }
+
+      /* ------------------------------------------------------------------ */
+      /*  Preset Portfolios                                                  */
+      /* ------------------------------------------------------------------ */
+      function PerformanceCell({ value }) {
+        const positive = value >= 0;
+        return (
+          <span
+            className={
+              "font-semibold tabular-nums " +
+              (positive ? "text-emerald-600" : "text-rose-600")
+            }
+          >
+            {(positive ? "+" : "") + value.toFixed(2)} %
+          </span>
+        );
+      }
+
+      function RiskBadge({ level, label }) {
+        const tone =
+          level <= 2
+            ? "bg-emerald-50 text-emerald-700 border-emerald-200"
+            : level === 3
+            ? "bg-amber-50 text-amber-700 border-amber-200"
+            : "bg-rose-50 text-rose-700 border-rose-200";
+        return (
+          <span
+            className={
+              "inline-flex items-center gap-1 rounded-full border px-2.5 py-0.5 text-[11px] font-semibold tracking-wide " +
+              tone
+            }
+          >
+            <span className="flex items-center gap-0.5">
+              {Array.from({ length: 5 }).map((_, i) => (
+                <span
+                  key={i}
+                  className={
+                    "h-1.5 w-1.5 rounded-full " +
+                    (i < level ? "bg-current" : "bg-current/25 opacity-30")
+                  }
+                />
+              ))}
+            </span>
+            {label}
+          </span>
+        );
+      }
+
+      function PortfolioIcon({ id }) {
+        if (id === "conservative")
+          return <ShieldIcon size={20} className="text-emerald-700" />;
+        if (id === "balanced")
+          return <SparklesIcon size={20} className="text-amber-700" />;
+        return <ZapIcon size={20} className="text-rose-700" />;
+      }
+
+      function DonutChart({ allocation }) {
+        const entries = allocationEntries(allocation);
+        const data = entries.map((e) => ({
+          name: e.meta.shortLabel,
+          value: e.weight,
+          color: e.meta.color,
+        }));
+        return (
+          <div className="relative h-[160px] w-[160px] shrink-0">
+            <ResponsiveContainer width="100%" height="100%">
+              <PieChart>
+                <Pie
+                  data={data}
+                  dataKey="value"
+                  innerRadius={50}
+                  outerRadius={72}
+                  paddingAngle={2}
+                  stroke="none"
+                >
+                  {data.map((d, i) => (
+                    <Cell key={i} fill={d.color} />
+                  ))}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
+            <div className="pointer-events-none absolute inset-0 flex flex-col items-center justify-center">
+              <div className="text-[10px] uppercase tracking-widest text-slate-500">
+                Alokace
+              </div>
+              <div className="text-sm font-semibold ep-text-navy">100 %</div>
+            </div>
+          </div>
+        );
+      }
+
+      function AllocationLegend({ allocation }) {
+        const entries = allocationEntries(allocation);
+        return (
+          <ul className="flex-1 space-y-2">
+            {entries.map((e) => (
+              <li key={e.key}>
+                <div className="mb-1 flex items-center justify-between text-xs">
+                  <span className="flex items-center gap-2 text-slate-700">
+                    <span
+                      className="h-2.5 w-2.5 rounded-sm"
+                      style={{ backgroundColor: e.meta.color }}
+                    />
+                    {e.meta.shortLabel}
+                  </span>
+                  <span className="font-semibold tabular-nums ep-text-navy">
+                    {e.weight} %
+                  </span>
+                </div>
+                <div className="h-1.5 w-full overflow-hidden rounded-full bg-slate-100">
+                  <div
+                    className="h-full rounded-full"
+                    style={{
+                      width: e.weight + "%",
+                      backgroundColor: e.meta.color,
+                    }}
+                  />
+                </div>
+              </li>
+            ))}
+          </ul>
+        );
+      }
+
+      function PerformanceTable({ stats }) {
+        return (
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-3">
+            <div className="mb-2 text-[10px] uppercase tracking-widest text-slate-500">
+              Historická výkonnost (% p.a.)
+            </div>
+            <div className="grid grid-cols-3 gap-2 text-center">
+              <div>
+                <div className="text-[11px] text-slate-500">1 rok</div>
+                <PerformanceCell value={stats.performance1y} />
+              </div>
+              <div className="border-x border-slate-200">
+                <div className="text-[11px] text-slate-500">3 roky</div>
+                <PerformanceCell value={stats.performance3y} />
+              </div>
+              <div>
+                <div className="text-[11px] text-slate-500">5 let</div>
+                <PerformanceCell value={stats.performance5y} />
+              </div>
+            </div>
+          </div>
+        );
+      }
+
+      function PresetPortfolios() {
+        const { initialInvestment } = useInvestment();
+        const [selectedId, setSelectedId] = useState(null);
+
+        const stats = useMemo(() => {
+          const out = {};
+          PRESET_PORTFOLIOS.forEach((p) => {
+            out[p.id] = computeStats(p.allocation, initialInvestment);
+          });
+          return out;
+        }, [initialInvestment]);
+
+        const selected =
+          PRESET_PORTFOLIOS.find((p) => p.id === selectedId) || null;
+
+        return (
+          <div className="space-y-6">
+            <div className="grid gap-5 md:grid-cols-3">
+              {PRESET_PORTFOLIOS.map((p) => {
+                const s = stats[p.id];
+                const isSelected = selectedId === p.id;
+                return (
+                  <article
+                    key={p.id}
+                    className={
+                      "group relative flex flex-col rounded-2xl border bg-white p-5 shadow-premium transition-all duration-300 " +
+                      (isSelected
+                        ? "border-ep-gold/70 ring-2 ring-ep-gold/30 shadow-premium-hover"
+                        : "border-slate-200 hover:-translate-y-0.5 hover:border-ep-blue/30 hover:shadow-premium-hover")
+                    }
+                  >
+                    <header className="mb-4 flex items-start justify-between gap-3">
+                      <div className="flex items-center gap-3">
+                        <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-slate-50">
+                          <PortfolioIcon id={p.id} />
+                        </div>
+                        <div>
+                          <h3 className="text-base font-semibold ep-text-navy">
+                            {p.name}
+                          </h3>
+                          <RiskBadge level={p.riskLevel} label={p.riskLabel} />
+                        </div>
+                      </div>
+                    </header>
+
+                    <p className="mb-4 text-sm leading-relaxed text-slate-500">
+                      {p.tagline}
+                    </p>
+
+                    <div className="mb-4 flex items-center gap-4">
+                      <DonutChart allocation={p.allocation} />
+                      <AllocationLegend allocation={p.allocation} />
+                    </div>
+
+                    <div className="mb-4">
+                      <PerformanceTable stats={s} />
+                    </div>
+
+                    <button
+                      type="button"
+                      onClick={() => setSelectedId(p.id)}
+                      className={
+                        "mt-auto inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-semibold transition-all " +
+                        (isSelected
+                          ? "bg-ep-gold text-ep-navy shadow-md"
+                          : "bg-ep-navy text-white hover:bg-ep-blue")
+                      }
+                      aria-pressed={isSelected}
+                    >
+                      {isSelected ? (
+                        <>
+                          <CheckCircle2Icon size={16} />
+                          Modelace načtena
+                        </>
+                      ) : (
+                        <>
+                          <LineChartIcon size={16} />
+                          Zobrazit modelaci vývoje
+                        </>
+                      )}
+                    </button>
+                  </article>
+                );
+              })}
+            </div>
+
+            {selected && (
+              <div className="fade-in">
+                <PerformanceChart
+                  allocation={selected.allocation}
+                  title={"Modelace — " + selected.name}
+                  subtitle="Vývoj počáteční investice v rámci vybraného přednastaveného portfolia."
+                />
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      /* ------------------------------------------------------------------ */
+      /*  Custom Portfolio Builder                                           */
+      /* ------------------------------------------------------------------ */
+      const BUILDER_ASSETS = [
+        "stocks",
+        "bonds",
+        "realEstate",
+        "commodities",
+        "cash",
+      ];
+      const DEFAULT_ALLOCATION = {
+        stocks: 40,
+        bonds: 30,
+        realEstate: 10,
+        commodities: 10,
+        cash: 10,
+      };
+
+      function SliderRow({ assetKey, value, max, onChange }) {
+        const meta = ASSET_CLASSES[assetKey];
+        const sliderRef = useRef(null);
+        useEffect(() => {
+          if (sliderRef.current) {
+            sliderRef.current.style.setProperty("--val", value + "%");
+          }
+        }, [value]);
+        const clamp = (n) => Math.max(0, Math.min(max, Math.round(n)));
+
+        return (
+          <div className="rounded-xl border border-slate-200 bg-white p-4 transition hover:border-ep-blue/30">
+            <div className="mb-2 flex items-center justify-between gap-3">
+              <div className="flex items-center gap-3">
+                <span
+                  className="h-3 w-3 rounded-sm"
+                  style={{ backgroundColor: meta.color }}
+                />
+                <div>
+                  <div className="text-sm font-semibold ep-text-navy">
+                    {meta.label}
+                  </div>
+                  <div className="text-[11px] text-slate-500">
+                    {meta.description}
+                  </div>
+                </div>
+              </div>
+              <div className="flex items-center gap-2">
+                <input
+                  type="number"
+                  min={0}
+                  max={100}
+                  step={1}
+                  value={value}
+                  onChange={(e) => onChange(clamp(Number(e.target.value || 0)))}
+                  className="no-spin w-16 rounded-md border border-slate-200 bg-slate-50 px-2 py-1 text-right text-sm font-semibold tabular-nums ep-text-navy outline-none focus:border-ep-blue focus:ring-2 focus:ring-ep-blue/20"
+                  aria-label={"Procento — " + meta.label}
+                />
+                <span className="text-xs font-semibold text-slate-500">%</span>
+              </div>
+            </div>
+            <input
+              ref={sliderRef}
+              type="range"
+              min={0}
+              max={100}
+              step={1}
+              value={value}
+              onChange={(e) => onChange(clamp(Number(e.target.value)))}
+              className="ep-slider"
+              aria-label={"Slider — " + meta.label}
+            />
+          </div>
+        );
+      }
+
+      function StatTile({ label, value, hint, tone }) {
+        const toneClass =
+          tone === "positive"
+            ? "text-emerald-600"
+            : tone === "negative"
+            ? "text-rose-600"
+            : "ep-text-navy";
+        return (
+          <div className="rounded-xl border border-slate-200 bg-slate-50 p-4">
+            <div className="text-[10px] uppercase tracking-widest text-slate-500">
+              {label}
+            </div>
+            <div className={"mt-1 text-xl font-bold tabular-nums " + toneClass}>
+              {value}
+            </div>
+            {hint && (
+              <div className="mt-1 text-[11px] text-slate-500">{hint}</div>
+            )}
+          </div>
+        );
+      }
+
+      function CustomPortfolioBuilder() {
+        const { initialInvestment, formatMoney } = useInvestment();
+        const [allocation, setAllocation] = useState(DEFAULT_ALLOCATION);
+        const [simulated, setSimulated] = useState(DEFAULT_ALLOCATION);
+
+        const total = useMemo(() => allocationSum(allocation), [allocation]);
+        const remaining = 100 - total;
+        const valid = total === 100;
+
+        const setWeight = (key, next) => {
+          setAllocation((prev) => {
+            const otherSum = Object.keys(prev)
+              .filter((k) => k !== key)
+              .reduce((s, k) => s + (prev[k] || 0), 0);
+            const maxAllowed = Math.max(0, 100 - otherSum);
+            const clamped = Math.min(next, maxAllowed);
+            return { ...prev, [key]: clamped };
+          });
+        };
+        const maxFor = (key) => {
+          const otherSum = Object.keys(allocation)
+            .filter((k) => k !== key)
+            .reduce((s, k) => s + (allocation[k] || 0), 0);
+          return Math.max(0, 100 - otherSum);
+        };
+        const resetAll = () => setAllocation(DEFAULT_ALLOCATION);
+        const normalize = () => {
+          if (total === 0) {
+            setAllocation(DEFAULT_ALLOCATION);
+            return;
+          }
+          setAllocation((prev) => {
+            const next = {};
+            const keys = Object.keys(prev);
+            let running = 0;
+            keys.forEach((k, idx) => {
+              const v = prev[k] || 0;
+              const scaled = Math.round((v / total) * 100);
+              if (idx === keys.length - 1) next[k] = 100 - running;
+              else {
+                next[k] = scaled;
+                running += scaled;
+              }
+            });
+            return next;
+          });
+        };
+        const runSimulation = () => {
+          if (!valid) return;
+          setSimulated({ ...allocation });
+        };
+
+        const stats = useMemo(
+          () => (simulated ? computeStats(simulated, initialInvestment) : null),
+          [simulated, initialInvestment]
+        );
+
+        return (
+          <div className="space-y-6">
+            <div className="grid gap-6 lg:grid-cols-[1.1fr_0.9fr]">
+              <div className="space-y-3">
+                {BUILDER_ASSETS.map((key) => (
+                  <SliderRow
+                    key={key}
+                    assetKey={key}
+                    value={allocation[key] || 0}
+                    max={maxFor(key)}
+                    onChange={(v) => setWeight(key, v)}
+                  />
+                ))}
+              </div>
+
+              <aside className="flex flex-col gap-4 rounded-2xl border border-slate-200 bg-white p-5 shadow-premium">
+                <div>
+                  <div className="text-[10px] uppercase tracking-widest text-slate-500">
+                    Celková alokace
+                  </div>
+                  <div className="mt-1 flex items-baseline gap-2">
+                    <span
+                      className={
+                        "text-4xl font-bold tabular-nums " +
+                        (valid
+                          ? "text-emerald-600"
+                          : total > 100
+                          ? "text-rose-600"
+                          : "ep-text-navy")
+                      }
+                    >
+                      {total}
+                    </span>
+                    <span className="text-lg font-semibold text-slate-500">
+                      / 100 %
+                    </span>
+                  </div>
+                  <div className="mt-3 h-2 w-full overflow-hidden rounded-full bg-slate-100">
+                    <div
+                      className={
+                        "h-full rounded-full transition-all " +
+                        (valid
+                          ? "bg-emerald-500"
+                          : total > 100
+                          ? "bg-rose-500"
+                          : "bg-ep-blue-light")
+                      }
+                      style={{ width: Math.min(100, total) + "%" }}
+                    />
+                  </div>
+                </div>
+
+                {valid ? (
+                  <div className="flex items-center gap-2 rounded-lg border border-emerald-200 bg-emerald-50 px-3 py-2 text-sm text-emerald-800">
+                    <CheckCircle2Icon size={16} />
+                    Alokace je vyvážená. Můžete spustit simulaci.
+                  </div>
+                ) : (
+                  <div className="flex items-center gap-2 rounded-lg border border-amber-200 bg-amber-50 px-3 py-2 text-sm text-amber-800">
+                    <AlertTriangleIcon size={16} />
+                    {total < 100
+                      ? "Pro spuštění simulace přidělte zbývajících " +
+                        remaining +
+                        " %."
+                      : "Snižte alokaci o " + Math.abs(remaining) + " %."}
+                  </div>
+                )}
+
+                <div className="flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={runSimulation}
+                    disabled={!valid}
+                    className={
+                      "inline-flex items-center justify-center gap-2 rounded-xl px-4 py-3 text-sm font-semibold transition-all " +
+                      (valid
+                        ? "bg-ep-navy text-white shadow-md hover:bg-ep-blue"
+                        : "cursor-not-allowed bg-slate-100 text-slate-400")
+                    }
+                  >
+                    <PlayCircleIcon size={16} />
+                    Spustit simulaci vlastního portfolia
+                  </button>
+
+                  <div className="flex gap-2">
+                    <button
+                      type="button"
+                      onClick={normalize}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold ep-text-navy transition hover:border-ep-blue/40 hover:bg-slate-50"
+                      title="Proporcionálně dorovnat na 100 %"
+                    >
+                      <ScaleIcon size={14} />
+                      Dorovnat na 100 %
+                    </button>
+                    <button
+                      type="button"
+                      onClick={resetAll}
+                      className="flex-1 inline-flex items-center justify-center gap-1.5 rounded-xl border border-slate-200 bg-white px-3 py-2 text-xs font-semibold ep-text-navy transition hover:border-ep-blue/40 hover:bg-slate-50"
+                    >
+                      <RotateCcwIcon size={14} />
+                      Výchozí alokace
+                    </button>
+                  </div>
+                </div>
+
+                <div className="rounded-lg border border-slate-200 bg-slate-50 p-3 text-[11px] leading-relaxed text-slate-500">
+                  <strong className="ep-text-navy">Upozornění:</strong> Modelace
+                  vychází z hypotetických historických dat a slouží pouze pro
+                  ilustraci. Minulé výnosy nejsou zárukou výnosů budoucích.
+                </div>
+              </aside>
+            </div>
+
+            {simulated && stats && (
+              <div className="fade-in space-y-6">
+                <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-premium md:p-7">
+                  <div className="mb-4 flex flex-col gap-1 md:flex-row md:items-end md:justify-between">
+                    <div>
+                      <h3 className="text-lg font-semibold ep-text-navy md:text-xl">
+                        Analytický report — Vlastní portfolio
+                      </h3>
+                      <p className="text-sm text-slate-500">
+                        Vyhodnocení na základě měsíčních dat 2021 – Q1 2026.
+                      </p>
+                    </div>
+                    <div className="text-right">
+                      <div className="text-[10px] uppercase tracking-widest text-slate-500">
+                        Konečná hodnota
+                      </div>
+                      <div className="text-xl font-bold ep-text-navy">
+                        {formatMoney(stats.finalValue)}
+                      </div>
+                    </div>
+                  </div>
+                  <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
+                    <StatTile
+                      label="Roční výnos (CAGR)"
+                      value={stats.cagr.toFixed(2) + " %"}
+                      tone={stats.cagr >= 0 ? "positive" : "negative"}
+                      hint="Geometrický průměr za sledované období."
+                    />
+                    <StatTile
+                      label="Volatilita (p.a.)"
+                      value={stats.volatility.toFixed(2) + " %"}
+                      hint="Realizovaná roční volatilita měsíčních výnosů."
+                    />
+                    <StatTile
+                      label="Sharpe Ratio"
+                      value={stats.sharpe.toFixed(2)}
+                      tone={stats.sharpe >= 1 ? "positive" : "neutral"}
+                      hint="Výnos nad bezrizikovou sazbu na jednotku rizika."
+                    />
+                    <StatTile
+                      label="Max. Drawdown"
+                      value={stats.maxDrawdown.toFixed(2) + " %"}
+                      tone="negative"
+                      hint="Největší pokles od vrcholu k dnu."
+                    />
+                  </div>
+                </div>
+
+                <PerformanceChart
+                  allocation={simulated}
+                  title="Modelace — Vlastní portfolio"
+                  subtitle="Vážený průměr historických výnosů jednotlivých aktiv dle vaší alokace."
+                />
+              </div>
+            )}
+          </div>
+        );
+      }
+
+      /* ------------------------------------------------------------------ */
+      /*  CollapsibleSection + Index page                                    */
+      /* ------------------------------------------------------------------ */
+      function CollapsibleSection({
+        title,
+        description,
+        icon,
+        children,
+        defaultOpen = false,
+      }) {
+        const [open, setOpen] = useState(defaultOpen);
+        return (
+          <section className="overflow-hidden rounded-2xl border border-slate-200 bg-white shadow-premium">
+            <button
+              type="button"
+              onClick={() => setOpen((v) => !v)}
+              aria-expanded={open}
+              className="flex w-full items-center justify-between gap-4 px-5 py-4 text-left transition hover:bg-slate-50 md:px-7 md:py-5"
+            >
+              <div className="flex items-center gap-4">
+                {icon && (
+                  <div className="flex h-10 w-10 items-center justify-center rounded-lg border border-slate-200 bg-slate-50 ep-text-navy">
+                    {icon}
+                  </div>
+                )}
+                <div>
+                  <h2 className="text-base font-semibold ep-text-navy md:text-lg">
+                    {title}
+                  </h2>
+                  {description && (
+                    <p className="text-xs text-slate-500 md:text-sm">
+                      {description}
+                    </p>
+                  )}
+                </div>
+              </div>
+              <ChevronDownIcon
+                size={20}
+                className={
+                  "text-slate-500 transition-transform duration-300 " +
+                  (open ? "rotate-180" : "")
+                }
+              />
+            </button>
+            <div
+              className={
+                "grid transition-all duration-300 ease-out " +
+                (open
+                  ? "grid-rows-[1fr] opacity-100"
+                  : "grid-rows-[0fr] opacity-0")
+              }
+            >
+              <div className="overflow-hidden">
+                <div className="border-t border-slate-200 px-5 py-6 md:px-7 md:py-8">
+                  {children}
+                </div>
+              </div>
+            </div>
+          </section>
+        );
+      }
+
+      function Index() {
+        return (
+          <div className="min-h-screen">
+            <Header />
+            <main className="mx-auto w-full max-w-[1400px] px-4 py-8 md:px-10 md:py-12">
+              <section className="mb-8 md:mb-10">
+                <div className="relative overflow-hidden rounded-2xl border border-slate-200 bg-ep-gradient p-6 text-white shadow-premium md:p-10">
+                  <div className="absolute inset-0 bg-ep-radial" />
+                  <div className="relative max-w-3xl">
+                    <span className="inline-flex items-center gap-2 rounded-full border border-ep-gold/40 bg-white/5 px-3 py-1 text-[11px] font-semibold uppercase tracking-[0.28em] text-ep-gold">
+                      Return Analyzer Pro
+                    </span>
+                    <h1 className="mt-4 font-serif text-3xl font-semibold leading-tight md:text-5xl">
+                      Zpětná modelace investičních strategií
+                    </h1>
+                    <p className="mt-3 max-w-2xl text-sm leading-relaxed text-white/80 md:text-base">
+                      Prozkoumejte, jak by se vyvíjela vaše počáteční investice
+                      v rámci tří doporučených profilů Erste Premier — nebo si
+                      sestavte vlastní portfolio a získejte detailní analytický
+                      report s metrikami rizika a výnosu.
+                    </p>
+                  </div>
+                </div>
+              </section>
+
+              <div className="space-y-6">
+                <CollapsibleSection
+                  defaultOpen
+                  title="Přednastavená portfolia"
+                  description="Tři doporučené profily reflektující rizikový apetit klienta."
+                  icon={<BarChart3Icon size={20} />}
+                >
+                  <PresetPortfolios />
+                </CollapsibleSection>
+
+                <CollapsibleSection
+                  title="Vlastní portfolio (Builder)"
+                  description="Sestavte si individuální alokaci a porovnejte ji s benchmarkem."
+                  icon={<Settings2Icon size={20} />}
+                >
+                  <CustomPortfolioBuilder />
+                </CollapsibleSection>
+              </div>
+
+              <footer className="mt-10 border-t border-slate-200 pt-6 text-center text-xs text-slate-500">
+                © {new Date().getFullYear()} Erste Premier — Demo · Modelace na
+                základě hypotetických historických dat. Nejedná se o investiční
+                doporučení.
+              </footer>
+            </main>
+          </div>
+        );
+      }
+
+      function App() {
+        return (
+          <InvestmentProvider>
+            <Index />
+          </InvestmentProvider>
+        );
+      }
+
+      /* ------------------------------------------------------------------ */
+      /*  Mount                                                              */
+      /* ------------------------------------------------------------------ */
+      const rootEl = document.getElementById("root");
+      ReactDOM.createRoot(rootEl).render(<App />);
+
+      // Hide boot loader once React has rendered
+      requestAnimationFrame(() => {
+        const loader = document.getElementById("boot-loader");
+        if (loader) {
+          loader.style.opacity = "0";
+          setTimeout(() => loader.remove(), 400);
+        }
+      });
+    </script>
   </body>
 </html>
