@@ -83,9 +83,9 @@ export const ASSET_CLASSES: Record<AssetClassKey, AssetClassMeta> = {
   },
   crypto: {
     key: "crypto",
-    label: "Krypto / Hotovost",
+    label: "Krypto aktiva",
     shortLabel: "Krypto",
-    description: "Bitcoin a vybrané digitální aktiva",
+    description: "Bitcoin a vybraná digitální aktiva",
     color: "#f59e0b",
     volatility: 62.0,
   },
