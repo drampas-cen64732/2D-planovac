@@ -1,0 +1,1 @@
+{"root":["./src/main.tsx","./src/vite-env.d.ts","./src/components/CustomPortfolioBuilder.tsx","./src/components/Header.tsx","./src/components/PerformanceChart.tsx","./src/components/PresetPortfolios.tsx","./src/context/InvestmentContext.tsx","./src/data/marketData.ts","./src/data/presetPortfolios.ts","./src/lib/portfolio.ts","./src/pages/Index.tsx"],"version":"5.9.3"}
